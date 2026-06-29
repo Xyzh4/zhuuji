@@ -1,0 +1,126 @@
+@startuml
+
+' 系统架构图
+
+' 定义组件样式
+skinparam componentStyle rectangle
+skinparam backgroundColor white
+skinparam arrowColor #333333
+skinparam componentBorderColor #666666
+skinparam componentBackgroundColor #F4F6F8
+skinparam noteBackgroundColor #E8F4F8
+
+' 前端层
+package "前端层" {
+  [浏览器] as Browser
+  [HTML页面] as HTML
+  [CSS样式] as CSS
+  [JavaScript] as JS
+  [Chart.js] as ChartJS
+  [ECharts] as ECharts
+}
+
+' 后端层
+package "后端层" {
+  [Flask应用] as FlaskApp
+  [API接口] as API
+  [数据库连接] as DBConnection
+}
+
+' 数据层
+package "数据层" {
+  database "xinjiang_tourism" as DB
+  [danmu_table] as DanmuTable
+  [xinjiang_geo] as GeoTable
+  [xinjiang_geo_stats] as GeoStatsTable
+  [xinjiang_facts] as FactsTable
+  [food_material_ratio] as FoodTable
+  [festival_heatmap] as FestivalTable
+  [tourist_temp_monthly] as TouristTable
+}
+
+' 连接关系
+Browser --> HTML : 访问
+HTML --> CSS : 引用
+HTML --> JS : 引用
+JS --> ChartJS : 使用
+JS --> ECharts : 使用
+JS --> API : AJAX请求
+
+API --> FlaskApp : 处理
+FlaskApp --> DBConnection : 调用
+DBConnection --> DB : 连接
+
+DB --> DanmuTable : 包含
+DB --> GeoTable : 包含
+DB --> GeoStatsTable : 包含
+DB --> FactsTable : 包含
+DB --> FoodTable : 包含
+DB --> FestivalTable : 包含
+DB --> TouristTable : 包含
+
+' API接口列表
+note right of API
+  API接口:
+  - /api/danmu
+  - /api/geo
+  - /api/geo-stats
+  - /api/xinjiang-facts
+  - /api/culture-radar
+  - /api/food-material
+  - /api/festival-heat
+  - /api/tourist-temp
+end note
+
+' 前端页面列表
+note right of HTML
+  前端页面:
+  - index.html
+  - home.html
+  - ethnic.html
+  - map.html
+  - travel.html
+  - timeline.html
+  - landscape.html
+  - ethnic-uyghur.html
+  - food.html
+end note
+
+@enduml
+
+@startuml
+
+' 系统流程图
+
+' 定义样式
+skinparam backgroundColor white
+skinparam arrowColor #333333
+skinparam activityBorderColor #666666
+skinparam activityBackgroundColor #F4F6F8
+
+' 流程开始
+start
+
+' 前端请求
+:用户在浏览器中访问页面; 
+:浏览器加载HTML、CSS和JavaScript; 
+:JavaScript发起API请求; 
+
+' 后端处理
+:Flask应用接收请求; 
+:调用对应的API接口; 
+:建立数据库连接; 
+:执行SQL查询; 
+:处理查询结果; 
+:返回JSON数据; 
+
+' 前端处理
+:JavaScript接收JSON数据; 
+:使用Chart.js/ECharts进行数据可视化; 
+:更新页面内容; 
+:显示结果给用户; 
+
+' 流程结束
+stop
+
+@enduml
