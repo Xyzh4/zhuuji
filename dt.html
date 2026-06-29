@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新疆文化 · 民族与地图</title>
+    <!-- Leaflet 样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ===== 您的现有卡片样式 ===== */
+        .ethnicity-card {
+            border: 1px solid #ddd;
+            border-radius: 16px;
+            padding: 16px;
+            background: #fff9ed;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            /* 添加您的其他样式 */
+        }
+        .card-icon {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .card-footer {
+            margin-top: 10px;
+            border-top: 1px dashed #c2a478;
+            padding-top: 8px;
+        }
+        .card-tag {
+            background: #eac8af;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            color: #5d2e1a;
+        }
+
+        /* ===== 第一版地图样式 (部分，完整请复制) ===== */
+        #map {
+            height: 500px;
+            width: 100%;
+            margin-bottom: 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .map-legend {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            background: rgba(255, 248, 235, 0.9);
+            backdrop-filter: blur(6px);
+            border-radius: 30px 30px 30px 8px;
+            padding: 18px 24px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+            border-left: 8px solid #c23b3b;
+            max-width: 320px;
+            pointer-events: none;
+        }
+        .cultural-marker {
+            background: #fdebd0;
+            border-radius: 50% 50% 50% 8%;
+            width: 38px !important;
+            height: 38px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #b13e3e;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transform: rotate(45deg);
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .cultural-marker i {
+            transform: rotate(-45deg);
+            font-size: 1.5rem;
+            color: #aa3a3a;
+        }
+        .footer-note {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10;
+            background: rgba(30,30,30,0.7);
+            backdrop-filter: blur(3px);
+            color: #f0e2cc;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            border: 1px solid #a77b55;
+            pointer-events: none;
+        }
+        /* 其他地图样式请自行补全 */
+    </style>
+</head>
+<body>
+    <!-- 地图区域 (完全保留第一版) -->
+    <div id="map"></div>
+    <div class="map-legend">
+        <h1><i class="fas fa-map-marked-alt"></i> 新疆文化地图</h1>
+        <div class="sub">—— 丝路明珠 · 多元交融 ——</div>
+        <div class="legend-items">
+            <span class="legend-item"><i class="fas fa-music"></i> 木卡姆</span>
+            <span class="legend-item"><i class="fas fa-utensils"></i> 美食</span>
+            <span class="legend-item"><i class="fas fa-mountain"></i> 帕米尔</span>
+            <span class="legend-item"><i class="fas fa-landmark"></i> 古城</span>
+            <span class="legend-item"><i class="fas fa-tshirt"></i> 刺绣</span>
+            <span class="legend-item"><i class="fas fa-dragon"></i> 史诗</span>
+        </div>
+    </div>
+    <div class="footer-note">
+        <i class="fas fa-hand-sparkles"></i> 指尖漫游 · 感受多彩新疆
+    </div>
+
+    <!-- 新增信息页容器 (点击标记后更新) -->
+    <div id="culture-info-panel" class="ethnicity-card" style="margin: 20px auto; max-width: 800px;">
+        <div class="card-icon">
+            <i class="fas fa-map-marked-alt" style="font-size: 3rem; color: #aa3a3a;"></i>
+        </div>
+        <h3 style="text-align: center;">点击地图上的文化标记</h3>
+        <p style="text-align: center; color: #5f4e3a;">查看新疆各地的文化印记</p >
+        <div class="card-footer" style="text-align: center;">
+            <span class="card-tag">欢迎探索</span>
+        </div>
+    </div>
+
+    <!-- 您的原有卡片区域 (可选，可以保留或与信息面板整合) -->
+    <section style="padding: 20px;">
+
+        <!-- 其他卡片... -->
+    </section>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- 地图初始化脚本 (修改版) -->
+    <script>
+        (function() {
+            const map = L.map('map', {
+                center: [41.0, 85.0],
+                zoom: 5.5,
+                minZoom: 4,
+                maxZoom: 10,
+                zoomControl: true,
+                attributionControl: true
+            });
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href=" ">OpenStreetMap</a >, &copy; CartoDB',
+                subdomains: 'abcd',
+                maxZoom: 19,
+                minZoom: 2
+            }).addTo(map);
+
+            function createCulturalIcon(iconClass) {
+                return L.divIcon({
+                    className: 'cultural-marker',
+                    html: `<i class="${iconClass}"></i>`,
+                    iconSize: [38, 38],
+                    popupAnchor: [0, -20]  // 虽然不再使用popup，保留无害
+                });
+            }
+
+            const culturalSites = [
+                { name: '喀什古城 · 香妃园', coords: [39.470, 75.992], desc: '维吾尔文化的活化石，喀喇汗王朝遗迹。艾提尕尔清真寺、百年老茶馆，十二木卡姆就在这里流淌。', icon: 'fas fa-landmark' },
+                { name: '乌鲁木齐 · 大巴扎', coords: [43.825, 87.616], desc: '世界规模最大的巴扎，维吾尔建筑与手工艺中心。英吉沙小刀、艾德莱斯绸，美食盛宴。', icon: 'fas fa-store' },
+                { name: '吐鲁番 · 火焰山 & 葡萄沟', coords: [42.951, 89.186], desc: '《西游记》火焰山，坎儿井智慧，葡萄沟的绿洲文化。维吾尔民歌“阿拉木汗”发源地。', icon: 'fas fa-fire' },
+                { name: '伊宁 · 喀赞其民俗村', coords: [43.908, 81.324], desc: '蓝色的维吾尔民居，马蹄声与手工冰淇淋。哈萨克族与维吾尔族刺绣、歌舞交融之地。', icon: 'fas fa-paint-brush' },
+                { name: '和田 · 玉石之路', coords: [37.114, 79.922], desc: '千年和田玉，艾德莱斯绸故乡。桑皮纸、地毯织造，绿洲维吾尔文化的核心。', icon: 'fas fa-gem' },
+                { name: '库车 · 克孜尔千佛洞', coords: [41.713, 82.936], desc: '龟兹古国遗存，比莫高窟更古老。西域佛教中心，壁画中的琵琶与箜篌。', icon: 'fas fa-pagoda' },
+                { name: '塔什库尔干 · 帕米尔', coords: [37.775, 75.224], desc: '塔吉克族鹰舞之乡，慕士塔格峰下。拜火教文化，民歌“花儿为什么这样红”。', icon: 'fas fa-mountain' },
+                { name: '阿勒泰 · 喀纳斯', coords: [48.508, 87.186], desc: '图瓦人村落，苏尔吹奏与呼麦。湖怪传说，蒙古族文化与哈萨克牧歌交织。', icon: 'fas fa-water' },
+                { name: '哈密 · 木卡姆传承中心', coords: [42.818, 93.515], desc: '哈密木卡姆独具特色，多浪与伊州乐的融合。哈密瓜文化，麦西来甫歌舞。', icon: 'fas fa-drum' },
+                { name: '巴音布鲁克 · 天鹅湖', coords: [43.032, 84.145], desc: '东归土尔扈特部蒙古族故乡，那达慕大会，长调与马头琴，草原文化秘境。', icon: 'fas fa-feather' },
+                { name: '麦盖提 · 刀郎文化', coords: [38.900, 77.650], desc: '刀郎木卡姆发源地，狩猎舞蹈与呐喊。叶尔羌河畔的维吾尔民间艺术。', icon: 'fas fa-guitar' },
+                { name: '克拉玛依 · 魔鬼城', coords: [45.600, 84.870], desc: '雅丹地貌中的游牧文化，哈萨克冬不拉传说。石油工业与戈壁景观交织。', icon: 'fas fa-wind' }
+            ];
+
+            // 获取信息面板
+            const infoPanel = document.getElementById('culture-info-panel');
+
+            culturalSites.forEach(site => {
+                const marker = L.marker(site.coords, {
+                    icon: createCulturalIcon(site.icon),
+                    riseOnHover: true
+                }).addTo(map);
+
+                // 移除 bindPopup，改为 click 事件更新信息面板
+                marker.on('click', function() {
+                    // 构建信息页 HTML，复用您的卡片样式
+                    const infoHTML = `
+                        <div class="card-icon">
+                            <i class="${site.icon}" style="font-size: 3rem; color: #aa3a3a;"></i>
+                        </div>
+                        <h3 style="text-align: center;">${site.name}</h3>
+                        <p style="font-size: 1rem; line-height: 1.6; color: #2e241a;">${site.desc}</p >
+                        <div class="card-footer" style="text-align: center;">
+                            <span class="card-tag">文化地标</span>
+                        </div>
+                    `;
+                    infoPanel.innerHTML = infoHTML;
+
+                    // 可选：平滑滚动到信息面板
+                    infoPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                });
+            });
+
+            // 添加文化圈（不变）
+            L.circle([38.5, 82.5], { radius: 320000, color: '#c2875d', weight: 1, fillColor: '#e9c9a3', fillOpacity: 0.08, interactive: false }).addTo(map);
+            L.circle([38.0, 75.0], { radius: 200000, color: '#8f6d5a', weight: 1, fillColor: '#bda79b', fillOpacity: 0.1, interactive: false }).addTo(map);
+            L.circle([47.5, 87.5], { radius: 180000, color: '#3f7a7a', weight: 1, fillColor: '#b2d8d8', fillOpacity: 0.1, interactive: false }).addTo(map);
+
+            // 自适应边界
+            const group = new L.featureGroup(culturalSites.map(s => L.marker(s.coords)));
+            map.fitBounds(group.getBounds().pad(0.25));
+
+            // 边界限制
+            const bounds = L.latLngBounds(L.latLng(32.0, 71.0), L.latLng(50.0, 98.0));
+            map.setMaxBounds(bounds);
+            map.on('drag', function() { map.panInsideBounds(bounds, { animate: false }); });
+
+            L.control.scale({ metric: true, imperial: false, position: 'bottomleft' }).addTo(map);
+        })();
+    </script>
+</body>
+</html>

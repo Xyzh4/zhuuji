@@ -1,0 +1,205 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>疆味·香满口 - 新疆民族文化</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- 左侧悬浮导航栏 -->
+    <nav class="side-nav">
+        <ul>
+            <li><a href="home.html">疆来·阿达西</a></li>
+            <li><a href="landscape.html">疆蕴·观地貌</a></li>
+            <li><a href="architecture.html">疆筑·赏建筑</a></li>
+            <li><a href="ethnic.html">疆俗·看民俗</a></li>
+            <li><a href="timeline.html">疆历·过节日</a></li>
+            <li><a href="food.html#food-title">疆味·香满口</a></li>
+            <li><a href="map.html">疆域·逛南北</a></li>
+            <li><a href="travel.html">疆行·品游记</a></li>
+        </ul>
+    </nav>
+    
+    <header class="header">
+        <div class="logo">疆来筑迹</div>
+        <nav class="nav">
+            <ul>
+                <li><a href="home.html">疆来·阿达西</a></li>
+                <li><a href="landscape.html">疆蕴·观地貌</a></li>
+                <li><a href="architecture.html">疆筑·赏建筑</a></li>
+                <li><a href="ethnic.html">疆俗·看民俗</a></li>
+                <li><a href="timeline.html">疆历·过节日</a></li>
+                <li><a href="food.html#food-title">疆味·香满口</a></li>
+                <li><a href="map.html">疆域·逛南北</a></li>
+                <li><a href="travel.html">疆行·品游记</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <!-- 背景音乐 -->
+    <audio id="background-music" loop autoplay>
+        <source src="新疆美丽公主组合 - Oynasun.mp3" type="audio/mpeg">
+        您的浏览器不支持音频播放
+    </audio>
+    <div class="music-control">
+        <button id="music-toggle" class="music-btn">🔊</button>
+    </div>
+
+    <section class="food-section">
+        <h2 id="food-title">疆味·香满口</h2>
+    </section>
+    
+    <!-- 轮播和南北对照布局 -->
+    <div class="food-main-layout">
+        <!-- 左侧板块 -->
+        <div class="food-left-container">
+            <div class="food-module food-rank">
+                <h3>美食排行榜</h3>
+                <div class="rank-list" id="food-rank-list"></div>
+            </div>
+        </div>
+        
+        <!-- 中间轮播 -->
+        <div class="food-hero-fullscreen">
+            <div class="food-hero-stage" id="food-hero-stage">
+                <div class="food-hero-orbit" id="food-orbit"></div>
+                <div class="food-hero-tooltip" id="food-orbit-tooltip" aria-hidden="true"></div>
+                <div class="food-hero-pie">
+                    <canvas id="food-method-pie" width="120" height="120" style="width: 120px; height: 120px;"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧板块 -->
+        <div class="food-right-container">
+            <div class="food-module food-compare">
+                <h3>南北对照</h3>
+                <div class="compare-layout">
+                    <div class="compare-col north">
+                        <div class="compare-head">北疆</div>
+                        <div class="compare-item">
+                            <div class="compare-main"><span class="compare-emoji">🐑</span><span class="compare-name">手抓羊肉</span></div>
+                            <div class="compare-desc">草原风味，肉质原香，配洋葱蒜片</div>
+                        </div>
+                        <div class="compare-item">
+                            <div class="compare-main"><span class="compare-emoji">🐴</span><span class="compare-name">马肉纳仁</span></div>
+                            <div class="compare-desc">薄面片拌马肉，筋道，秋冬进补</div>
+                        </div>
+                        <div class="compare-item">
+                            <div class="compare-main"><span class="compare-emoji">🐟</span><span class="compare-name">冷水鱼</span></div>
+                            <div class="compare-desc">天山冷水，清蒸红烧都鲜</div>
+                        </div>
+                        <div class="compare-item">
+                            <div class="compare-main"><span class="compare-emoji">🥛</span><span class="compare-name">奶茶</span></div>
+                            <div class="compare-desc">咸香浓郁，配馕或包尔萨克</div>
+                        </div>
+                        <div class="compare-item">
+                            <div class="compare-main"><span class="compare-emoji">🍯</span><span class="compare-name">蜂蜜</span></div>
+                            <div class="compare-desc">花源丰富，清甜，搭酸奶热茶</div>
+                        </div>
+                        <div class="compare-item">
+                            <div class="compare-main"><span class="compare-emoji">🥩</span><span class="compare-name">熏马肉</span></div>
+                            <div class="compare-desc">果木熏制，风味独特，越嚼越香</div>
+                        </div>
+                        <div class="compare-item">
+                            <div class="compare-main"><span class="compare-emoji">🧀</span><span class="compare-name">奶疙瘩</span></div>
+                            <div class="compare-desc">传统乳制品，酸甜适口，营养丰富</div>
+                        </div>
+                        <div class="compare-foot">特色：草原游牧风味，肉食豪放</div>
+                    </div>
+                    <div class="compare-col south">
+                        <div class="compare-head">南疆</div>
+                        <div class="compare-item">
+                            <div class="compare-main"><span class="compare-emoji">🥟</span><span class="compare-name">烤包子</span></div>
+                            <div class="compare-desc">皮薄馅足，炭火烤制，外脆内嫩</div>
+                        </div>
+                        <div class="compare-item">
+                            <div class="compare-main"><span class="compare-emoji">🍲</span><span class="compare-name">鸽子汤</span></div>
+                            <div class="compare-desc">汤鲜肉嫩，加药材香料，暖胃滋补</div>
+                        </div>
+                        <div class="compare-item">
+                            <div class="compare-main"><span class="compare-emoji">🍢</span><span class="compare-name">红柳烤肉</span></div>
+                            <div class="compare-desc">红柳枝串羊肉，焦香四溢，蘸孜然</div>
+                        </div>
+                        <div class="compare-item">
+                            <div class="compare-main"><span class="compare-emoji">🥤</span><span class="compare-name">酸奶</span></div>
+                            <div class="compare-desc">酸甜爽口，加葡萄干坚果，解腻开胃</div>
+                        </div>
+                        <div class="compare-item">
+                            <div class="compare-main"><span class="compare-emoji">🍈</span><span class="compare-name">哈密瓜</span></div>
+                            <div class="compare-desc">日照强，温差大，甜度高，夏季必吃</div>
+                        </div>
+                        <div class="compare-item">
+                            <div class="compare-main"><span class="compare-emoji">🍚</span><span class="compare-name">手抓饭</span></div>
+                            <div class="compare-desc">胡萝卜羊肉配米饭，油亮喷香，营养丰富</div>
+                        </div>
+                        <div class="compare-item">
+                            <div class="compare-main"><span class="compare-emoji">🥟</span><span class="compare-name">薄皮包子</span></div>
+                            <div class="compare-desc">皮薄如纸，羊肉洋葱馅，一口一个香</div>
+                        </div>
+                        <div class="compare-item">
+                            <div class="compare-main"><span class="compare-emoji">🍇</span><span class="compare-name">葡萄干</span></div>
+                            <div class="compare-desc">吐鲁番优质葡萄，自然晾干，甜蜜可口</div>
+                        </div>
+                        <div class="compare-foot">特色：绿洲农耕风味，香料浓郁</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="food-section">
+        
+        
+        <div class="food-content food-viz">
+
+
+
+            <div class="food-module food-stories">
+                <h3>招牌菜故事 <span class="scroll-hint">（上下滚动查看全文）</span></h3>
+                <div class="story-waterfall" id="food-story-waterfall"></div>
+            </div>
+
+            <div class="food-module food-trivia">
+                <h3>美食冷知识</h3>
+                <div class="trivia-grid" id="food-trivia-grid"></div>
+            </div>
+
+            <div class="food-module food-combos">
+                <h3>美食组合推荐</h3>
+                <div class="combo-table" id="food-combo-table"></div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <h3>新疆民族文化数字化平台</h3>
+                <p>弘扬民族文化，促进文旅融合</p>
+            </div>
+            <div class="footer-links">
+                <ul>
+                    <li><a href="index.html#home">疆来·阿达西</a></li>
+                    <li><a href="index.html#ethnic">疆俗·看民俗</a></li>
+                    <li><a href="index.html#timeline">疆历·过节日</a></li>
+                    <li><a href="index.html#map">疆域·逛南北</a></li>
+                    <li><a href="food.html">疆味·香满口</a></li>
+                    <li><a href="architecture.html">疆筑·赏建筑</a></li>
+                    <li><a href="travel.html">疆行·品游记</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 疆来筑迹 版权所有</p>
+        </div>
+    </footer>
+
+    <!-- 回到顶部按钮 -->
+    <button id="back-to-top" class="back-to-top" title="回到顶部">⬆ 返回顶部</button>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新疆·双模式行程规划 | AI自由定制 & 特色推荐路线</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+/* 基础样式 */
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+ 
+/* 艾德莱斯纹样背景 */
+body {
+background-color: #f8f0e3;
+background-image: 
+linear-gradient(45deg, #f8f0e3 0%, #f5e6d3 100%),
+repeating-linear-gradient(45deg, rgba(255, 210, 170, 0.1) 0px, rgba(255, 210, 170, 0.1) 2px, transparent 2px, transparent 4px),
+repeating-linear-gradient(-45deg, rgba(210, 150, 100, 0.1) 0px, rgba(210, 150, 100, 0.1) 2px, transparent 2px, transparent 4px);
+min-height: 100vh;
+color: #333;
+line-height: 1.6;
+}
+
+/* 容器 */
+.container {
+max-width: 1400px;
+margin: 0 auto;
+padding: 20px;
+}
+
+/* 行程规划样式 */
+.map-container {
+background: white;
+border-radius: 15px;
+box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+overflow: hidden;
+}
+.map-header {
+background: #8B4513;
+padding: 18px 28px;
+color: white;
+display: flex;
+align-items: center;
+gap: 20px;
+flex-wrap: wrap;
+border-bottom: 3px solid #dbb158;
+}
+.map-header i {
+font-size: 24px;
+color: #ffd966;
+}
+.map-header h2 {
+font-weight: 500;
+font-size: 1.7rem;
+text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+}
+.search-box {
+margin-left: auto;
+background: rgba(255,255,255,0.15);
+padding: 10px 24px;
+border-radius: 40px;
+color: white;
+display: flex;
+align-items: center;
+gap: 8px;
+border: 1px solid rgba(255,255,255,0.3);
+}
+.control-panel {
+background: #f8f0e3;
+padding: 25px 30px;
+border-bottom: 4px solid #dbb158;
+display: flex;
+flex-wrap: wrap;
+align-items: flex-end;
+gap: 30px 40px;
+}
+.mode-switch {
+display: flex;
+gap: 15px;
+background: rgba(255,255,255,0.8);
+padding: 8px 20px;
+border-radius: 60px;
+align-items: center;
+}
+.mode-switch button {
+background: white;
+border: none;
+padding: 8px 24px;
+border-radius: 40px;
+font-weight: 600;
+cursor: pointer;
+transition: 0.2s;
+color: #8B4513;
+border: 1px solid #dbb158;
+}
+.mode-switch button.active {
+background: #dbb158;
+color: white;
+box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.control-item {
+display: flex;
+flex-direction: column;
+gap: 8px;
+min-width: 160px;
+}
+.control-item label {
+font-weight: 600;
+color: #8B4513;
+font-size: 1rem;
+}
+.control-item select, .control-item input, .control-item .city-check-group {
+background: white;
+border: 2px solid #dbb158;
+border-radius: 40px;
+padding: 12px 20px;
+font-size: 1rem;
+font-weight: 500;
+color: #8B4513;
+outline: none;
+}
+.city-check-group {
+background: white;
+border-radius: 28px;
+padding: 12px 20px;
+max-height: 200px;
+overflow-y: auto;
+display: flex;
+flex-wrap: wrap;
+gap: 12px;
+}
+.city-check-group label {
+display: flex;
+align-items: center;
+gap: 8px;
+font-weight: normal;
+font-size: 0.9rem;
+cursor: pointer;
+background: #f8f0e3;
+padding: 5px 12px;
+border-radius: 30px;
+}
+.city-check-group input {
+width: auto;
+margin: 0;
+padding: 0;
+transform: scale(1.1);
+}
+.generate-btn {
+background: #8B4513;
+border: none;
+border-radius: 60px;
+padding: 12px 36px;
+font-weight: 700;
+font-size: 1.2rem;
+color: white;
+box-shadow: 0 8px 0 #5c3010;
+cursor: pointer;
+transition: 0.1s ease;
+margin-left: auto;
+border: 1px solid #dbb158;
+}
+.generate-btn:active {
+transform: translateY(4px);
+box-shadow: 0 4px 0 #5c3010;
+}
+.map-schema {
+background: #f8f0e3;
+background-image: linear-gradient(145deg, #f5e6d3, #f8f0e3);
+padding: 25px 20px;
+border-bottom: 4px solid #dbb158;
+position: relative;
+}
+.map-schema::before {
+content: "⛅";
+position: absolute;
+top: 10px;
+right: 30px;
+font-size: 3rem;
+opacity: 0.2;
+transform: rotate(10deg);
+}
+.schema-title {
+font-size: 1.4rem;
+font-weight: 600;
+color: #8B4513;
+text-align: center;
+margin-bottom: 20px;
+text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+}
+.mini-route-display {
+display: flex;
+flex-wrap: wrap;
+align-items: center;
+justify-content: center;
+gap: 8px 15px;
+background: rgba(255,255,255,0.7);
+backdrop-filter: blur(5px);
+border-radius: 60px;
+padding: 15px 25px;
+border: 2px solid #dbb158;
+}
+.route-node {
+display: flex;
+flex-direction: column;
+align-items: center;
+background: white;
+border-radius: 40px;
+padding: 5px 18px;
+font-weight: 600;
+color: #8B4513;
+box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+border: 1px solid #dbb158;
+}
+.route-node i {
+color: #dbb158;
+margin-right: 5px;
+}
+.route-arrow {
+font-size: 1.8rem;
+color: #8B4513;
+font-weight: 300;
+}
+.review-section {
+margin-top: 20px;
+background: white;
+border-radius: 30px;
+padding: 15px 25px;
+text-align: center;
+border: 2px solid #dbb158;
+font-style: italic;
+box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.review-section i {
+color: #dbb158;
+margin-right: 10px;
+}
+.review-text {
+font-size: 1rem;
+color: #8B4513;
+font-weight: 500;
+}
+.content-wrapper {
+padding: 0;
+background: transparent;
+margin-top: 0;
+}
+.section-title {
+font-size: 1.4rem;
+font-weight: 700;
+margin: 20px 0 15px 10px;
+display: flex;
+align-items: center;
+gap: 10px;
+border-left: 8px solid #8B4513;
+padding-left: 15px;
+color: #8B4513;
+text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+}
+.route-grid {
+display: flex;
+flex-direction: row;
+gap: 15px;
+overflow-x: auto;
+padding: 0 20px 20px 20px;
+}
+.day-card {
+background: #f8f0e3;
+border-radius: 20px;
+padding: 1rem 1.2rem;
+box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+border: 1px solid #dbb158;
+min-width: 320px;
+flex-shrink: 0;
+}
+.day-header {
+display: flex;
+flex-wrap: wrap;
+align-items: center;
+gap: 0.8rem 1.2rem;
+margin-bottom: 0.8rem;
+}
+.day-badge {
+background: #8B4513;
+color: white;
+font-weight: 600;
+font-size: 1rem;
+padding: 0.3rem 1.2rem;
+border-radius: 40px;
+display: inline-flex;
+align-items: center;
+gap: 8px;
+box-shadow: 0 3px 0 #5c3010;
+}
+.day-route {
+background: white;
+padding: 0.4rem 1.2rem;
+border-radius: 40px;
+font-size: 0.95rem;
+color: #8B4513;
+}
+.day-content {
+display: grid;
+grid-template-columns: 1fr 0.9fr;
+gap: 1.2rem;
+}
+@media (max-width:800px){
+.day-content{ grid-template-columns:1fr; }
+}
+.activity i {
+color: #8B4513;
+width: 22px;
+font-size: 0.9rem;
+}
+.activity p {
+line-height: 1.5;
+color: #333;
+margin: 0.4rem 0;
+font-size: 0.95rem;
+}
+.attraction-link {
+color: #8B4513;
+font-weight: 600;
+cursor: pointer;
+border-bottom: 2px dashed #dbb158;
+transition: 0.1s;
+}
+.attraction-link:hover {
+background: #f8f0e3;
+border-bottom: 2px solid #8B4513;
+}
+.food-spot {
+background: white;
+border-radius: 18px;
+padding: 0.8rem 1rem;
+border: 1px solid #dbb158;
+}
+.food-spot h4 {
+color: #8B4513;
+border-bottom: 2px solid #dbb158;
+padding-bottom: 5px;
+margin-bottom: 10px;
+font-size: 1rem;
+}
+.shop-name {
+background: #f8f0e3;
+padding: 0.15rem 0.8rem;
+border-radius: 20px;
+font-weight: 700;
+margin-right: 4px;
+display: inline-block;
+color: #8B4513;
+font-size: 0.9rem;
+}
+.mileage-note {
+background: #f8f0e3;
+padding: 0.15rem 1rem;
+border-radius: 20px;
+display: inline-block;
+margin-top: 8px;
+font-size: 0.85rem;
+color: #8B4513;
+}
+.tips-block {
+margin-top: 0;
+background: #8B4513;
+border-radius: 0 0 20px 20px;
+padding: 1.2rem 1.5rem;
+color: white;
+border: 2px solid #dbb158;
+border-top: none;
+}
+.tips-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+gap: 0.8rem;
+}
+.tip-item {
+background: rgba(255,255,255,0.15);
+padding: 0.6rem 1rem;
+border-radius: 20px;
+font-weight: 500;
+border: 1px solid rgba(255,255,255,0.3);
+font-size: 0.9rem;
+}
+.footer-note {
+text-align: center;
+margin-top: 20px;
+color: #8B4513;
+}
+hr {
+border: 1px solid #dbb158;
+margin: 20px 0;
+}
+.info-popup {
+position: fixed;
+bottom: 30px;
+right: 30px;
+background: white;
+border-radius: 28px;
+box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+width: 320px;
+padding: 0;
+border: 3px solid #dbb158;
+transform: translateY(120%);
+transition: transform 0.3s ease;
+z-index: 1000;
+}
+.info-popup.show {
+transform: translateY(0);
+}
+.popup-header {
+background: #8B4513;
+color: white;
+padding: 15px 20px;
+border-radius: 24px 24px 0 0;
+font-weight: 700;
+font-size: 1.2rem;
+display: flex;
+justify-content: space-between;
+align-items: center;
+border-bottom: 2px solid #dbb158;
+}
+.popup-header i {
+cursor: pointer;
+font-size: 1.5rem;
+color: #ffea9e;
+}
+.popup-content {
+padding: 20px;
+max-height: 300px;
+overflow-y: auto;
+font-size: 0.95rem;
+color: #333;
+line-height: 1.5;
+}
+.hide {
+display: none;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="map-container">
+<div class="map-header">
+<i class="fas fa-tree" style="color: #ffdb7e;"></i>
+<h2>新疆·双模式行程规划 | AI自由定制 & 特色推荐</h2>
+<div class="search-box"><i class="fas fa-search"></i> 探索草原牧场</div>
+</div>
+
+<div class="control-panel">
+<!-- 模式切换 -->
+<div class="mode-switch">
+<button id="modeRecommendBtn" class="active">✨ 推荐路线</button>
+<button id="modeAIBtn">🤖 AI自由规划</button>
+</div>
+
+<!-- 推荐路线模式控件 -->
+<div id="recommendControls" class="controls-group" style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 30px 40px;">
+<div class="control-item">
+<label><i class="fas fa-plane-departure"></i> 出发地</label>
+<select id="startCity">
+<option value="乌鲁木齐" selected>乌鲁木齐</option>
+<option value="伊宁">伊宁</option>
+<option value="喀什">喀什</option>
+</select>
+</div>
+<div class="control-item">
+<label><i class="fas fa-map-signal"></i> 特色路线</label>
+<select id="routeTheme">
+<option value="classic" selected>经典·乌市+吐鲁番</option>
+<option value="north">北疆·喀纳斯环线</option>
+<option value="yili">伊犁·草原湖泊</option>
+<option value="south">南疆·人文风情</option>
+<option value="mixed">全疆·大环线(部分)</option>
+<option value="frontier">🇨🇳 国防边境·帕米尔高原</option>
+<option value="silkroad">🐫 丝绸之路·西域古道</option>
+</select>
+</div>
+<div class="control-item">
+<label><i class="fas fa-calendar-alt"></i> 旅行天数 (<span id="daysDisplayRecommend">3</span>天)</label>
+<input type="range" id="daySliderRecommend" min="3" max="14" value="3" step="1">
+</div>
+</div>
+
+<!-- AI规划模式控件 (初始隐藏) -->
+<div id="aiControls" class="controls-group hide" style="display: none; flex-wrap: wrap; align-items: flex-start; gap: 30px 40px;">
+<div class="control-item">
+<label><i class="fas fa-city"></i> 选择旅行城市 (可多选)</label>
+<div id="cityChecklist" class="city-check-group"></div>
+</div>
+<div class="control-item">
+<label><i class="fas fa-calendar-alt"></i> 旅行天数 (<span id="daysDisplayAI">3</span>天)</label>
+<input type="range" id="daySliderAI" min="3" max="14" value="3" step="1">
+</div>
+<div class="control-item">
+<label><i class="fas fa-info-circle"></i> 提示</label>
+<div style="background:#fef1c0; border-radius:40px; padding:10px 20px; font-size:0.9rem;">
+<i class="fas fa-map-pin"></i> AI将按顺序分配天数 (即将接入高德API)
+</div>
+</div>
+</div>
+
+<button class="generate-btn" id="generateBtn"><i class="fas fa-route"></i> 生成行程</button>
+</div>
+
+<div class="map-schema">
+<div class="schema-title"><i class="fas fa-mountain"></i> 路线概览 · 城市停留天数</div>
+<div class="mini-route-display" id="routeOverview"></div>
+<!-- 网友评价区域 (仅推荐模式显示) -->
+<div id="reviewContainer" class="review-section" style="display: none;">
+<i class="fas fa-comment-dots"></i> <span id="reviewText" class="review-text"></span>
+</div>
+<!-- AI模式提示 -->
+<div id="aiTip" class="review-section" style="display: none; background: #cce3c0;">
+<i class="fas fa-robot"></i> AI规划模式 · 基于您选择的城市智能分配每日行程 (即将支持高德真实路径规划)
+</div>
+</div>
+
+<div class="content-wrapper">
+<div class="section-title"><i class="fas fa-feather-alt"></i> 每日详细行程 · 点击橙色景点看介绍</div>
+<div class="route-grid" id="dayCardsContainer"></div>
+<div class="tips-block">
+<h3 style="display: flex; gap: 10px;"><i class="fas fa-lightbulb"></i> 草原生存锦囊</h3>
+<div class="tips-grid">
+<div class="tip-item"><i class="fas fa-clock"></i> 时差：10:00上班，22:00日落</div>
+<div class="tip-item"><i class="fas fa-id-card"></i> 身份证随身！加油/安检必刷</div>
+<div class="tip-item"><i class="fas fa-temperature-low"></i> 带薄羽绒/冲锋衣</div>
+<div class="tip-item"><i class="fas fa-car"></i> 自驾严控限速</div>
+<div class="tip-item"><i class="fas fa-gas-pump"></i> 加油乘客下车</div>
+<div class="tip-item"><i class="fas fa-mountain"></i> 独库6-9月开放</div>
+<div class="tip-item"><i class="fas fa-utensils"></i> 菜量大，少点勤加</div>
+<div class="tip-item"><i class="fas fa-hotel"></i> 旺季提前订房</div>
+</div>
+</div>
+<hr>
+<div class="footer-note"><i class="fas fa-heart" style="color:#b86b0e;"></i> 风吹草地见牛羊 · 美食与远方</div>
+</div>
+
+<div id="infoPopup" class="info-popup">
+<div class="popup-header">
+<span id="popupTitle">景点介绍</span>
+<i class="fas fa-times" id="closePopup"></i>
+</div>
+<div class="popup-content">
+<img id="popupImage" src="" alt="景点图片" style="width: 100%; border-radius: 10px; margin-bottom: 15px;">
+<div id="popupDesc">介绍内容...</div>
+</div>
+</div>
+
+<script>
+(function() {
+// ================= 景点介绍库 (完整) =================
+const attractionDescriptions = {
+'天山天池': { desc: '天山天池古称“瑶池”，位于阜康市境内，博格达峰下半山腰。湖面海拔1910米，是以高山湖泊、云杉林和雪山景观为特色的避暑胜地。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=tianshan%20heavenly%20lake%2C%20xinjiang%2C%20alpine%20lake%2C%20snow%20mountains%2C%20beautiful%20landscape&amp;image_size=landscape_4_3' },
+'国际大巴扎': { desc: '新疆国际大巴扎是世界规模最大的巴扎，集伊斯兰建筑、民族商贸、餐饮于一体。手工艺品、干果、乐器琳琅满目。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=xinjiang%20international%20bazaar%2C%20islamic%20architecture%2C%20colorful%2C%20market&amp;image_size=landscape_4_3' },
+'坎儿井': { desc: '坎儿井与万里长城、京杭大运河并称中国古代三大工程，利用地下暗渠引水，是吐鲁番绿洲的生命之源。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=kaner%20well%2C%20xinjiang%20ancient%20water%20system%2C%20underground%20canal&amp;image_size=landscape_4_3' },
+'火焰山': { desc: '火焰山因《西游记》闻名，夏季地表温度可达70℃以上。赤红色山体如火焰燃烧，景区有巨型金箍棒温度计。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=flame%20mountain%2C%20turpan%2C%20xinjiang%2C%20red%20rock%2C%20hot%20temperature&amp;image_size=landscape_4_3' },
+'库木塔格沙漠': { desc: '库木塔格沙漠是世界上唯一与城市相连的沙漠，位于鄯善县。可体验沙漠越野、骑骆驼、滑沙，落日壮美。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=kumtag%20desert%2C%20shanshan%2C%20xinjiang%2C%20sand%20dunes%2C%20sunset&amp;image_size=landscape_4_3' },
+'葡萄沟': { desc: '葡萄沟是吐鲁番火焰山下的峡谷，以盛产葡萄闻名。溪流两侧葡萄架成片，维吾尔族民居点缀其中。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=grape%20valley%2C%20turpan%2C%20xinjiang%2C%20grape%20vines%2C%20uyghur%20houses&amp;image_size=landscape_4_3' },
+'五彩滩': { desc: '五彩滩位于布尔津县，额尔齐斯河畔。河岸岩层以红、土黄、浅绿等色彩为主，夕阳下五彩斑斓。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=colorful%20beach%2C%20burqin%2C%20xinjiang%2C%20erqis%20river%2C%20colorful%20rock%20layers&amp;image_size=landscape_4_3' },
+'喀纳斯湖': { desc: '喀纳斯湖是高山淡水湖，以神秘的湖怪、变色湖水和原始泰加林闻名。观鱼台是俯瞰全景最佳位置。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=kanas%20lake%2C%20xinjiang%2C%20alpine%20lake%2C%20forest%2C%20beautiful%20landscape&amp;image_size=landscape_4_3' },
+'神仙湾': { desc: '神仙湾是喀纳斯三湾之一，常有云雾缭绕如同仙境，早晨是拍摄晨雾的最佳地点。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=shenxian%20bay%2C%20kanas%2C%20xinjiang%2C%20misty%20morning%2C%20仙境&amp;image_size=landscape_4_3' },
+'月亮湾': { desc: '月亮湾是喀纳斯河一道优美的S形弯道，水面如弯月，两侧森林茂密。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=moon%20bay%2C%20kanas%2C%20xinjiang%2C%20S-shaped%20river%2C%20forest&amp;image_size=landscape_4_3' },
+'卧龙湾': { desc: '卧龙湾因湖中小岛形似恐龙而得名，水面平静，倒影如画。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=wolong%20bay%2C%20kanas%2C%20xinjiang%2C%20island%20like%20dinosaur%2C%20calm%20water&amp;image_size=landscape_4_3' },
+'禾木村': { desc: '禾木村是图瓦人聚居的原始村落，木屋错落，清晨炊烟袅袅，是摄影天堂。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=hemu%20village%2C%20xinjiang%2C%20tuva%20people%2C%20wooden%20houses%2C%20smoke%20in%20morning&amp;image_size=landscape_4_3' },
+'世界魔鬼城': { desc: '魔鬼城是典型雅丹地貌，风蚀土丘形态各异，风起时呼啸如鬼哭。可乘小火车游览。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=devil%20city%2C%20xinjiang%2C%20yardang%20landform%2C%20wind%20eroded%20hills&amp;image_size=landscape_4_3' },
+'赛里木湖': { desc: '赛里木湖是新疆海拔最高、面积最大的高山湖泊，湖水清澈湛蓝，被誉为“大西洋最后一滴眼泪”。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=sailimu%20lake%2C%20xinjiang%2C%20alpine%20lake%2C%20blue%20water%2C%20mountains&amp;image_size=landscape_4_3' },
+'果子沟大桥': { desc: '果子沟大桥是新疆第一座斜拉桥，横跨果子沟峡谷，桥面距谷底180米，是通往赛里木湖的必经之路。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=guozigou%20bridge%2C%20xinjiang%2C%20cable-stayed%20bridge%2C%20valley%2C%20mountains&amp;image_size=landscape_4_3' },
+'喀赞其民俗街': { desc: '喀赞其是伊宁的老城区，以蓝色民居为主，维吾尔族风情浓郁。可以坐马车、逛手工艺品店。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=kazanqi%20folk%20street%2C%20yining%2C%20xinjiang%2C%20blue%20houses%2C%20uyghur%20style&amp;image_size=landscape_4_3' },
+'那拉提草原': { desc: '那拉提草原是世界四大草原之一，有“空中草原”之称。夏季绿草如茵，野花盛开，远处雪山皑皑。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=nalati%20grassland%2C%20xinjiang%2C%20alpine%20meadow%2C%20green%20grass%2C%20wildflowers&amp;image_size=landscape_4_3' },
+'独库公路': { desc: '独库公路连接北疆南疆，全长561公里，横亘天山。沿途有峡谷、草原、雪山，一日历四季。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=duku%20highway%2C%20xinjiang%2C%20mountain%20road%2C%20valley%2C%20snow%20mountains&amp;image_size=landscape_4_3' },
+'喀什古城': { desc: '喀什古城是世界上现存规模最大的生土建筑群，巷道迷宫般曲折。开城仪式热闹非凡。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=kashgar%20ancient%20city%2C%20xinjiang%2C%20mud%20buildings%2C%20narrow%20alleys%2C%20uyghur%20style&amp;image_size=landscape_4_3' },
+'白沙湖': { desc: '白沙湖位于帕米尔高原，湖畔白沙山银白细腻，湖水湛蓝，远处是公格尔九别峰，景色纯净。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=white%20sand%20lake%2C%20pamir%20plateau%2C%20xinjiang%2C%20white%20sand%20dunes%2C%20blue%20water&amp;image_size=landscape_4_3' },
+'卡拉库里湖': { desc: '卡拉库里湖位于慕士塔格峰脚下，湖水深邃如墨，倒映着冰山之父慕士塔格。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=karakul%20lake%2C%20xinjiang%2C%20muztagh%20ata%20peak%2C%20deep%20blue%20water%2C%20reflection&amp;image_size=landscape_4_3' },
+'盘龙古道': { desc: '盘龙古道位于塔什库尔干，有600多个S形弯道，口号“今日走过了所有弯路，从此人生尽是坦途”。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=panlong%20ancient%20road%2C%20tashkurgan%2C%20xinjiang%2C%20S-shaped%20curves%2C%20mountain%20road&amp;image_size=landscape_4_3' },
+'石头城': { desc: '石头城是古代丝绸之路上的城堡遗址，位于塔县县城北侧，如今只剩断壁残垣，但仍可想象昔日雄姿。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=stone%20city%2C%20tashkurgan%2C%20xinjiang%2C%20ancient%20castle%20ruins%2C%20silk%20road&amp;image_size=landscape_4_3' },
+'和田夜市': { desc: '和田夜市是新疆最有名的夜市之一，烤鸽子、酸奶粽子、烤蛋、红柳烤肉等美食应有尽有。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=hotan%20night%20market%2C%20xinjiang%2C%20food%20stalls%2C%20grilled%20food%2C%20busy&amp;image_size=landscape_4_3' },
+'天山神秘大峡谷': { desc: '天山神秘大峡谷位于库车，红褐色山体经亿万年风雨侵蚀形成，曲径通幽，谷内泉水潺潺。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=tianshan%20mysterious%20grand%20canyon%2C%20kuche%2C%20xinjiang%2C%20red%20rock%2C%20narrow%20path&amp;image_size=landscape_4_3' },
+'库车大寺': { desc: '库车大寺是新疆第二大清真寺，建筑风格融合维吾尔和伊斯兰元素，庄严肃穆。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=kuche%20grand%20mosque%2C%20xinjiang%2C%20islamic%20architecture%2C%20uyghur%20style&amp;image_size=landscape_4_3' },
+'克孜尔千佛洞': { desc: '克孜尔千佛洞是比莫高窟更早的佛教石窟群，壁画风格独特，是研究佛教艺术的宝库。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=kezier%20thousand%20buddha%20caves%2C%20xinjiang%2C%20buddhist%20caves%2C%20ancient%20murals&amp;image_size=landscape_4_3' },
+'红其拉甫口岸': { desc: '红其拉甫口岸是世界海拔最高的口岸，位于帕米尔高原，中巴友谊公路的终点，常年积雪，国门庄严。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=khunjerab%20pass%2C%20xinjiang%2C%20china-pakistan%20border%2C%20high%20altitude%2C%20snowy&amp;image_size=landscape_4_3' },
+'慕士塔格峰': { desc: '慕士塔格峰海拔7546米，有“冰山之父”之称，山体终年积雪，是登山爱好者的圣地。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=muztagh%20ata%20peak%2C%20xinjiang%2C%20ice%20mountain%2C%20snow%20covered%2C%20majestic&amp;image_size=landscape_4_3' },
+'塔什库尔干石头城': { desc: '石头城遗址位于塔县县城北侧，曾是古丝绸之路上的重要驿站，断壁残垣诉说着千年历史。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=tashkurgan%20stone%20city%20ruins%2C%20xinjiang%2C%20ancient%20silk%20road%20post&amp;image_size=landscape_4_3' },
+'艾提尕尔清真寺': { desc: '艾提尕尔清真寺是新疆最大的清真寺，位于喀什古城中心，建筑风格宏伟，是穆斯林礼拜的重要场所。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=etigar%20mosque%2C%20kashgar%2C%20xinjiang%2C%20largest%20mosque%2C%20islamic%20architecture&amp;image_size=landscape_4_3' },
+'库车老城': { desc: '库车老城保留了维吾尔族传统民居，热斯坦路彩色木门精美绝伦，充满异域风情。', img: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=kuche%20old%20town%2C%20xinjiang%2C%20uyghur%20traditional%20houses%2C%20colorful%20doors&amp;image_size=landscape_4_3' }
+};
+
+// ================= 城市活动/美食数据库 (沿用) =================
+const cityDatabase = {
+'乌鲁木齐': { activities: [ '抵达乌鲁木齐，逛<span class="attraction-link" data-name="国际大巴扎">国际大巴扎</span>，晚上去领馆巷吃小吃', '<span class="attraction-link" data-name="天山天池">天山天池</span>一日游', '新疆自治区博物馆 + 红山公园', '南山牧场体验草原风光', '华凌市场采购干果' ], foods: ['领馆巷美食', '楼兰秘烤', '血站大盘鸡', '小李子大盘鸡', '魏家羊羔肉'] },
+'吐鲁番': { activities: [ '游览<span class="attraction-link" data-name="坎儿井">坎儿井</span>、<span class="attraction-link" data-name="火焰山">火焰山</span>', '<span class="attraction-link" data-name="库木塔格沙漠">库木塔格沙漠</span>日落越野', '<span class="attraction-link" data-name="葡萄沟">葡萄沟</span>+交河故城', '麻扎村+吐峪沟' ], foods: ['阔希玛克拉烤包子', '艾力开木抓饭', '哈里克特色抓饭', '豆豆面'] },
+'布尔津': { activities: [ '穿越S21沙漠公路', '<span class="attraction-link" data-name="五彩滩">五彩滩</span>落日', '河堤夜市', '中俄老码头' ], foods: ['斯外达餐厅', '哈纳斯酒家', '烤狗鱼'] },
+'喀纳斯': { activities: [ '游览三湾(<span class="attraction-link" data-name="神仙湾">神仙湾</span>/<span class="attraction-link" data-name="月亮湾">月亮湾</span>/<span class="attraction-link" data-name="卧龙湾">卧龙湾</span>)', '登观鱼台俯瞰<span class="attraction-link" data-name="喀纳斯湖">喀纳斯湖</span>', '湖边栈道漫步', '白哈巴村' ], foods: ['牧民土火锅', '老村餐饮广场', '图瓦人美食'] },
+'禾木': { activities: [ '前往<span class="attraction-link" data-name="禾木村">禾木村</span>', '哈登平台看日落', '骑马美丽峰', '白桦林拍照' ], foods: ['桃源水吧', '土火锅', '风干肉'] },
+'魔鬼城': { activities: [ '<span class="attraction-link" data-name="世界魔鬼城">世界魔鬼城</span>小火车', '拍雅丹日落', '乌尔禾捡金丝玉' ], foods: ['老王烧烤', '小马烤肉', '阿罗新疆菜'] },
+'赛里木湖': { activities: [ '<span class="attraction-link" data-name="赛里木湖">赛里木湖</span>环湖', '点将台', '松树头徒步', '<span class="attraction-link" data-name="果子沟大桥">果子沟大桥</span>观景' ], foods: ['高白鲑鱼餐', '精河服务区简餐'] },
+'伊宁': { activities: [ '<span class="attraction-link" data-name="喀赞其民俗街">喀赞其民俗街</span>坐马车', '六星街手风琴博物馆', '伊犁河大桥日落', '汉人街美食' ], foods: ['艾勒喀斯尔餐厅', '六根棍面馆', '巴彦岱烤包子', '伊孜海尔冰淇淋'] },
+'那拉提': { activities: [ '<span class="attraction-link" data-name="那拉提草原">那拉提草原</span>空中草原', '河谷草原漫步', '森林公园徒步' ], foods: ['歹歹的巴扎的餐厅', '周有全农家乐', '烤肉一条街'] },
+'独库公路': { activities: [ '穿越<span class="attraction-link" data-name="独库公路">独库公路</span>北段', '乔尔玛烈士陵园', '哈希勒根达坂', '返回乌鲁木齐' ], foods: ['乔尔玛服务区', '牧民酸奶', '乌鲁木齐散伙饭'] },
+'喀什': { activities: [ '<span class="attraction-link" data-name="喀什古城">喀什古城</span>开城仪式', '<span class="attraction-link" data-name="艾提尕尔清真寺">艾提尕尔清真寺</span>', '香妃园', '喀什夜市' ], foods: ['百年老茶馆', '蓝公羊烤肉', '艾力扎提抓饭'] },
+'塔县': { activities: [ '<span class="attraction-link" data-name="白沙湖">白沙湖</span>、<span class="attraction-link" data-name="卡拉库里湖">卡拉库里湖</span>', '<span class="attraction-link" data-name="慕士塔格峰">慕士塔格峰</span>', '<span class="attraction-link" data-name="盘龙古道">盘龙古道</span>', '<span class="attraction-link" data-name="石头城">石头城</span>' ], foods: ['塔县牦牛肉火锅', '火炬餐厅', '烤包子'] },
+'和田': { activities: [ '和田团城', '和田玉巴扎', '<span class="attraction-link" data-name="和田夜市">和田夜市</span>' ], foods: ['和田夜市', '玫瑰花烤肉店', '库麦琪'] },
+'库车': { activities: [ '库车王府', '<span class="attraction-link" data-name="库车老城">库车老城</span>', '<span class="attraction-link" data-name="天山神秘大峡谷">天山神秘大峡谷</span>', '<span class="attraction-link" data-name="克孜尔千佛洞">克孜尔千佛洞</span>' ], foods: ['库车大馕', '亚克西姆餐厅', '再帕尔美食城'] },
+'红其拉甫': { activities: [ '前往<span class="attraction-link" data-name="红其拉甫口岸">红其拉甫口岸</span>，仰望国门', '沿途雪山连绵', '中巴友谊公路' ], foods: ['沿途牧民简餐', '塔县牦牛肉'] }
+};
+// 补充红其拉甫
+if (!cityDatabase['红其拉甫']) cityDatabase['红其拉甫'] = cityDatabase['塔县'];
+
+// 所有城市列表 (用于AI模式多选)
+const allCities = Object.keys(cityDatabase).sort();
+
+// ================= 推荐路线相关 =================
+const themeRoutes = {
+'classic': ['乌鲁木齐', '吐鲁番', '鄯善'],
+'north': ['乌鲁木齐', '布尔津', '喀纳斯', '禾木', '魔鬼城'],
+'yili': ['伊宁', '赛里木湖', '伊宁', '那拉提', '独库公路'],
+'south': ['喀什', '塔县', '喀什', '和田', '库车'],
+'mixed': ['乌鲁木齐', '布尔津', '喀纳斯', '魔鬼城', '赛里木湖', '伊宁', '那拉提', '独库公路', '吐鲁番'],
+'frontier': ['喀什', '塔县', '红其拉甫', '塔县', '喀什'],
+'silkroad': ['乌鲁木齐', '吐鲁番', '库车', '喀什']
+};
+const routeReviews = {
+'classic': '👍 网友“自由的风”：乌鲁木齐天池很美，吐鲁番的烤包子超好吃！三天紧凑但很充实，库木塔格沙漠落日一生难忘。',
+'north': '🌟 网友“行走的相机”：喀纳斯的秋天是上帝打翻的调色盘，禾木的晨雾让人想住一辈子。独库公路太震撼，强烈推荐！',
+'yili': '💚 网友“草原牧歌”：那拉提草原比瑞士还美，赛里木湖蓝得不像话，伊宁的冰淇淋绝了。7天完全不够！',
+'south': '✨ 网友“西域迷”：喀什古城仿佛穿越千年，帕米尔高原的白沙湖像仙境，和田夜市吃到扶墙。南疆人文太迷人。',
+'mixed': '🌈 网友“环疆达人”：这条大环线把北疆风光和南疆人文一网打尽，虽然累但超值！独库公路和赛里木湖并列第一。',
+'frontier': '🇨🇳 网友“边境行者”：红其拉甫国门庄严神圣，慕士塔格峰巍峨壮丽，盘龙古道真的走完所有弯路。边防证记得提前办！',
+'silkroad': '🐫 网友“古道驼铃”：从乌鲁木齐到喀什，一路穿越吐鲁番火焰山、库车大峡谷，仿佛重走玄奘之路。库车大馕太香了！'
+};
+const cityStayRange = {
+'乌鲁木齐': {min:1, max:3}, '吐鲁番': {min:1, max:2}, '布尔津': {min:1, max:2},
+'喀纳斯': {min:2, max:3}, '禾木': {min:1, max:2}, '魔鬼城': {min:1, max:2},
+'赛里木湖': {min:1, max:2}, '伊宁': {min:1, max:2}, '那拉提': {min:1, max:2},
+'独库公路': {min:1, max:2}, '喀什': {min:2, max:3}, '塔县': {min:1, max:2},
+'和田': {min:1, max:2}, '库车': {min:1, max:2}, '鄯善': {min:1, max:1},
+'红其拉甫': {min:1, max:1}
+};
+function allocateDays(cities, totalDays) {
+let minSum = 0, maxSum = 0;
+const mins = [], maxs = [];
+cities.forEach(city => {
+const range = cityStayRange[city] || {min:1, max:2};
+mins.push(range.min);
+maxs.push(range.max);
+minSum += range.min;
+maxSum += range.max;
+});
+if (totalDays <= minSum) {
+let days = [...mins];
+let sum = minSum;
+for (let i = days.length-1; i >= 0; i--) {
+if (sum <= totalDays) break;
+let reduce = Math.min(days[i] - 1, sum - totalDays);
+days[i] -= reduce;
+sum -= reduce;
+}
+return days;
+} else if (totalDays <= maxSum) {
+let days = [...mins];
+let remaining = totalDays - minSum;
+for (let i = 0; i < days.length; i++) {
+if (remaining <= 0) break;
+let add = Math.min(maxs[i] - mins[i], remaining);
+days[i] += add;
+remaining -= add;
+}
+return days;
+} else {
+let days = [...maxs];
+let extra = totalDays - maxSum;
+if (extra > 0) days[days.length-1] += extra;
+return days;
+}
+}
+
+// 生成行程通用函数
+function renderItinerary(finalCities, totalDays) {
+let cardsHtml = '';
+for (let day = 0; day < finalCities.length; day++) {
+const city = finalCities[day];
+const cityData = cityDatabase[city] || cityDatabase['乌鲁木齐'];
+const activities = cityData.activities || ['自由探索'];
+const foods = cityData.foods || ['当地美食'];
+
+let cityDayIndex = 1;
+for (let i = day-1; i >= 0; i--) {
+if (finalCities[i] === city) cityDayIndex++;
+else break;
+}
+const actIndex = (cityDayIndex - 1) % activities.length;
+let act = activities[actIndex];
+const foodItems = foods.slice(0, 3).map(f => `<li><span class="shop-name">店</span> ${f}</li>`).join('');
+let mileage = '';
+if (day > 0 && finalCities[day-1] !== city) {
+mileage = `昨日 ${finalCities[day-1]} → 今日 ${city}，约${Math.floor(Math.random()*250+150)}km`;
+} else {
+mileage = `继续停留在 ${city}，市内短途`;
+}
+
+cardsHtml += `
+<div class="day-card">
+<div class="day-header">
+<span class="day-badge"><i class="fas fa-sun"></i> DAY${day+1}</span>
+<span class="day-route"><i class="fas fa-map-pin"></i> ${city}</span>
+</div>
+<div class="day-content">
+<div class="activity">
+<p><i class="fas fa-route"></i> ${act}</p>
+<p><i class="fas fa-moon"></i> 住宿: ${city}</p>
+<div class="mileage-note"><i class="fas fa-car"></i> ${mileage}</div>
+</div>
+<div class="food-spot">
+<h4><i class="fas fa-utensils"></i> 今日美食推荐</h4>
+<ul>${foodItems}</ul>
+</div>
+</div>
+</div>`;
+}
+document.getElementById('dayCardsContainer').innerHTML = cardsHtml;
+}
+function updateRouteOverview(finalCities) {
+const cityCount = {};
+finalCities.forEach(c => cityCount[c] = (cityCount[c] || 0) + 1);
+const uniqueCities = [];
+for (let i = 0; i < finalCities.length; i++) {
+if (i === 0 || finalCities[i] !== finalCities[i-1]) uniqueCities.push(finalCities[i]);
+}
+let overviewHtml = '';
+uniqueCities.forEach((city, idx) => {
+const count = cityCount[city];
+overviewHtml += `<div class="route-node"><i class="fas fa-map-marker-alt"></i> ${city} <span style="background:#f09b43; color:white; border-radius:30px; padding:2px 8px; margin-left:6px;">${count}天</span></div>`;
+if (idx < uniqueCities.length - 1) overviewHtml += `<span class="route-arrow"> → </span>`;
+});
+document.getElementById('routeOverview').innerHTML = overviewHtml;
+}
+
+// 模式控制
+let currentMode = 'recommend'; // 'recommend' or 'ai'
+const recommendControls = document.getElementById('recommendControls');
+const aiControls = document.getElementById('aiControls');
+const reviewContainer = document.getElementById('reviewContainer');
+const aiTip = document.getElementById('aiTip');
+const modeRecommendBtn = document.getElementById('modeRecommendBtn');
+const modeAIBtn = document.getElementById('modeAIBtn');
+const generateBtn = document.getElementById('generateBtn');
+
+// 推荐模式控件
+const startCityEl = document.getElementById('startCity');
+const routeThemeEl = document.getElementById('routeTheme');
+const daySliderRecommend = document.getElementById('daySliderRecommend');
+const daysDisplayRecommend = document.getElementById('daysDisplayRecommend');
+// AI模式控件
+const daySliderAI = document.getElementById('daySliderAI');
+const daysDisplayAI = document.getElementById('daysDisplayAI');
+const cityChecklistDiv = document.getElementById('cityChecklist');
+
+// 生成城市复选框
+function buildCityCheckboxes() {
+cityChecklistDiv.innerHTML = '';
+allCities.forEach(city => {
+const label = document.createElement('label');
+const cb = document.createElement('input');
+cb.type = 'checkbox';
+cb.value = city;
+cb.checked = (city === '乌鲁木齐' || city === '吐鲁番' || city === '喀什'); // 默认选中几个热门
+label.appendChild(cb);
+label.appendChild(document.createTextNode(city));
+cityChecklistDiv.appendChild(label);
+});
+}
+buildCityCheckboxes();
+
+// 监听天数滑块
+daySliderRecommend.addEventListener('input', () => {
+daysDisplayRecommend.textContent = daySliderRecommend.value;
+});
+daySliderAI.addEventListener('input', () => {
+daysDisplayAI.textContent = daySliderAI.value;
+});
+
+// 模式切换
+function setMode(mode) {
+currentMode = mode;
+if (mode === 'recommend') {
+recommendControls.style.display = 'flex';
+aiControls.style.display = 'none';
+reviewContainer.style.display = 'block';
+aiTip.style.display = 'none';
+modeRecommendBtn.classList.add('active');
+modeAIBtn.classList.remove('active');
+// 重新生成推荐行程
+generateRecommend();
+} else {
+recommendControls.style.display = 'none';
+aiControls.style.display = 'flex';
+reviewContainer.style.display = 'none';
+aiTip.style.display = 'block';
+modeAIBtn.classList.add('active');
+modeRecommendBtn.classList.remove('active');
+generateAI();
+}
+}
+modeRecommendBtn.addEventListener('click', () => setMode('recommend'));
+modeAIBtn.addEventListener('click', () => setMode('ai'));
+
+// 推荐路线生成
+function generateRecommend() {
+const start = startCityEl.value;
+const theme = routeThemeEl.value;
+let totalDays = parseInt(daySliderRecommend.value, 10);
+let rawCities = themeRoutes[theme] || themeRoutes['classic'];
+if (start !== '乌鲁木齐') {
+if (rawCities.includes(start)) {
+const idx = rawCities.indexOf(start);
+rawCities = rawCities.slice(idx);
+} else {
+rawCities = [start, ...rawCities];
+}
+}
+const daysPerCity = allocateDays(rawCities, totalDays);
+const expandedCities = [];
+for (let i = 0; i < rawCities.length; i++) {
+const city = rawCities[i];
+const stay = daysPerCity[i];
+for (let d = 0; d < stay; d++) expandedCities.push(city);
+}
+while (expandedCities.length < totalDays) expandedCities.push(rawCities[rawCities.length-1]);
+const finalCities = expandedCities.slice(0, totalDays);
+updateRouteOverview(finalCities);
+renderItinerary(finalCities, totalDays);
+// 显示评价
+const review = routeReviews[theme] || routeReviews['classic'];
+document.getElementById('reviewText').innerText = review;
+}
+
+// AI规划模式生成 (基于用户勾选城市)
+function generateAI() {
+const selectedCities = Array.from(document.querySelectorAll('#cityChecklist input:checked')).map(cb => cb.value);
+if (selectedCities.length === 0) {
+alert('请至少选择一个城市');
+return;
+}
+let totalDays = parseInt(daySliderAI.value, 10);
+// 智能分配天数: 每个城市至少1天，多余天数按顺序添加到最后一个城市
+let daysPerCity = new Array(selectedCities.length).fill(1);
+let remaining = totalDays - selectedCities.length;
+if (remaining > 0) {
+// 将剩余天数加到最后一天（也可以均摊，简单起见加到最后）
+daysPerCity[daysPerCity.length-1] += remaining;
+} else if (remaining < 0) {
+// 天数少于城市数，截断城市
+while (daysPerCity.length > totalDays) daysPerCity.pop();
+}
+const expandedCities = [];
+for (let i = 0; i < selectedCities.length; i++) {
+const city = selectedCities[i];
+const stay = daysPerCity[i] || 1;
+for (let d = 0; d < stay; d++) expandedCities.push(city);
+}
+// 确保总天数准确
+const finalCities = expandedCities.slice(0, totalDays);
+updateRouteOverview(finalCities);
+renderItinerary(finalCities, totalDays);
+}
+
+generateBtn.addEventListener('click', () => {
+if (currentMode === 'recommend') generateRecommend();
+else generateAI();
+});
+
+// 弹窗逻辑
+const popup = document.getElementById('infoPopup');
+const popupTitle = document.getElementById('popupTitle');
+const popupDesc = document.getElementById('popupDesc');
+const popupImage = document.getElementById('popupImage');
+const closePopup = document.getElementById('closePopup');
+closePopup.addEventListener('click', () => popup.classList.remove('show'));
+document.addEventListener('click', (e) => {
+if (e.target.classList.contains('attraction-link')) {
+const name = e.target.getAttribute('data-name');
+const attraction = attractionDescriptions[name];
+const desc = attraction ? attraction.desc : '暂无详细介绍，欢迎亲自探索！';
+const img = attraction && attraction.img ? attraction.img : '';
+popupTitle.innerText = name;
+popupDesc.innerText = desc;
+popupImage.src = img;
+popupImage.style.display = img ? 'block' : 'none';
+popup.classList.add('show');
+}
+if (!popup.contains(e.target) && !e.target.classList.contains('attraction-link')) {
+popup.classList.remove('show');
+}
+});
+
+// 初始化
+setMode('recommend');
+})();
+</script>
+</div>
+</div>
+</body>
+</html>

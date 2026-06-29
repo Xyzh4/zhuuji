@@ -1,0 +1,706 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>疆行·品游记 - 新疆民族文化</title>
+        <link rel="stylesheet" href="style.css">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+<body>
+    <!-- 左侧悬浮导航栏 -->
+    <nav class="side-nav">
+        <ul>
+            <li><a href="home.html">疆来·阿达西</a></li>
+            <li><a href="landscape.html">疆蕴·观地貌</a></li>
+            <li><a href="architecture.html">疆筑·赏建筑</a></li>
+            <li><a href="ethnic.html">疆俗·看民俗</a></li>
+            <li><a href="timeline.html">疆历·过节日</a></li>
+            <li><a href="food.html">疆味·香满口</a></li>
+            <li><a href="map.html">疆域·逛南北</a></li>
+            <li><a href="travel.html">疆行·品游记</a></li>
+        </ul>
+    </nav>
+    
+    <header class="header">
+        <div class="logo">疆来筑迹</div>
+        <nav class="nav">
+            <ul>
+                <li><a href="home.html">疆来·阿达西</a></li>
+                <li><a href="landscape.html">疆蕴·观地貌</a></li>
+                <li><a href="architecture.html">疆筑·赏建筑</a></li>
+                <li><a href="ethnic.html">疆俗·看民俗</a></li>
+                <li><a href="timeline.html">疆历·过节日</a></li>
+                <li><a href="food.html">疆味·香满口</a></li>
+                <li><a href="map.html">疆域·逛南北</a></li>
+                <li><a href="travel.html">疆行·品游记</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <!-- 背景音乐 -->
+    <audio id="background-music" loop autoplay>
+        <source src="新疆美丽公主组合 - Oynasun.mp3" type="audio/mpeg">
+        您的浏览器不支持音频播放
+    </audio>
+    <div class="music-control">
+        <button id="music-toggle" class="music-btn">🔊</button>
+    </div>
+
+    <section id="travel" class="travel-section">
+        <h2>疆行·品游记</h2>
+
+    <!-- 季节和游记并排容器 -->
+    <div class="season-stories-container">
+        <!-- 季节旅行指南和温度图表容器 -->
+        <div class="season-guide-container">
+            <!-- 旅行季节指南 -->
+            <section class="season-guide">
+                <h3>季节旅行指南</h3>
+                <p>不同季节，新疆有不同的美景等待你的发现</p>
+                <div class="season-container">
+                    <div class="season-circle">
+                        <div class="season-card active" data-season="spring" data-index="0">
+                            <div class="season-icon">🌸</div>
+                            <div class="season-info">
+                                <h4>春季</h4>
+                                <p class="season-period">3-5月</p>
+                                <div class="season-highlight">伊犁杏花</div>
+                                <div class="season-daytime">白天: 6:30-20:30</div>
+                            </div>
+                        </div>
+                        <div class="season-card" data-season="summer" data-index="1">
+                            <div class="season-icon">☀️</div>
+                            <div class="season-info">
+                                <h4>夏季</h4>
+                                <p class="season-period">6-8月</p>
+                                <div class="season-highlight">那拉提草原</div>
+                                <div class="season-daytime">白天: 5:30-22:00</div>
+                            </div>
+                        </div>
+                        <div class="season-card" data-season="autumn" data-index="2">
+                            <div class="season-icon">🍂</div>
+                            <div class="season-info">
+                                <h4>秋季</h4>
+                                <p class="season-period">9-11月</p>
+                                <div class="season-highlight">喀纳斯金秋</div>
+                                <div class="season-daytime">白天: 7:00-20:00</div>
+                            </div>
+                        </div>
+                        <div class="season-card" data-season="winter" data-index="3">
+                            <div class="season-icon">❄️</div>
+                            <div class="season-info">
+                                <h4>冬季</h4>
+                                <p class="season-period">12-2月</p>
+                                <div class="season-highlight">天山雪景</div>
+                                <div class="season-daytime">白天: 8:30-18:00</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="season-detail">
+                        <div class="detail-image">
+                            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20spring%20apricot%20blossoms%20Yili%20Valley&image_size=landscape_16_9" alt="春季伊犁杏花" id="detail-image">
+                        </div>
+                        <div class="detail-info">
+                            <h4 id="detail-title">推荐景点</h4>
+                            <ul id="detail-attractions">
+                                <li>伊犁杏花沟</li>
+                                <li>吐尔根乡</li>
+                                <li>新源野果林</li>
+                            </ul>
+                            <p id="detail-tips">春季的新疆，平均气温在10-20℃，建议携带轻薄外套，注意防晒。杏花花期一般在4月中上旬，最佳观赏时间是清晨和傍晚。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+        </div>
+
+        <!-- 用户旅行故事 -->
+        <section class="user-stories">
+            <h3>旅行者的故事</h3>
+            <p>听听其他旅行者在新疆的精彩经历</p>
+            
+            <!-- 故事筛选和排序控件 -->
+            <div class="story-controls">
+                <div class="story-filter">
+                    <button class="active" data-tag="all">全部</button>
+                    <button data-tag="春季">春季</button>
+                    <button data-tag="夏季">夏季</button>
+                    <button data-tag="秋季">秋季</button>
+                    <button data-tag="冬季">冬季</button>
+                    <button data-tag="喀什古城">喀什古城</button>
+                    <button data-tag="喀纳斯">喀纳斯</button>
+                    <button data-tag="草原">草原</button>
+                    <button data-tag="摄影">摄影</button>
+                    <button data-tag="美食之旅">美食</button>
+                    <button data-tag="亲子游">亲子</button>
+                </div>
+                <div class="story-sort">
+                    <label for="sort-option">排序：</label>
+                    <select id="sort-option">
+                        <option value="latest">最新</option>
+                        <option value="popular">最受欢迎</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="stories-grid">
+                <div class="story-item" data-tags="春季 喀什古城 美食之旅 文化体验">
+                    <div class="story-header">
+                        <div class="story-avatar">👩‍💼</div>
+                        <div class="story-author">
+                            <h4>李小姐</h4>
+                            <p>旅行博主</p>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <p>在新疆的一个月里，我遇到了最热情的人们，尝到了最美味的食物，看到了最震撼的风景。特别是在喀什古城，我仿佛穿越回了古代，每一条巷子都有不同的故事。维吾尔族老人坐在门口晒太阳，孩子们在巷子里奔跑，空气中弥漫着烤包子的香气。在这里，时间仿佛慢了下来，让我真正感受到了新疆的烟火气。</p>
+                        <div class="read-more">
+                            <button>阅读更多</button>
+                        </div>
+                    </div>
+                    <div class="story-tags">
+                        <span>#喀什古城</span>
+                        <span>#美食之旅</span>
+                        <span>#文化体验</span>
+                    </div>
+                </div>
+                <div class="story-item" data-tags="秋季 喀纳斯 摄影">
+                    <div class="story-header">
+                        <div class="story-avatar">👨‍🚀</div>
+                        <div class="story-author">
+                            <h4>张先生</h4>
+                            <p>摄影爱好者</p>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <p>秋季的喀纳斯让我惊艳，金黄的白桦林倒映在碧绿的湖水中，仿佛置身于童话世界。我在禾木村住了三天，每天早晨都被晨雾环绕，感觉像在仙境中。清晨的阳光透过雾气洒在村庄上，木屋的烟囱冒出袅袅炊烟，构成了一幅完美的画卷。我用相机记录下了这些美丽的瞬间，每一张照片都是一幅艺术品。</p>
+                        <div class="read-more">
+                            <button>阅读更多</button>
+                        </div>
+                    </div>
+                    <div class="story-tags">
+                        <span>#喀纳斯</span>
+                        <span>#摄影</span>
+                        <span>#秋季</span>
+                    </div>
+                </div>
+                <div class="story-item" data-tags="夏季 草原 亲子游 民俗体验">
+                    <div class="story-header">
+                        <div class="story-avatar">👪</div>
+                        <div class="story-author">
+                            <h4>王家庭</h4>
+                            <p>亲子游家庭</p>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <p>带着孩子来新疆，他们最开心的就是在那拉提草原上骑马，在葡萄沟里摘葡萄。我们还参加了当地的篝火晚会，和牧民们一起唱歌跳舞，这是一次难忘的家庭旅行。孩子们学会了简单的维吾尔族舞蹈，还结交了当地的小朋友，他们一起在草原上奔跑、放风筝，留下了美好的回忆。</p>
+                        <div class="read-more">
+                            <button>阅读更多</button>
+                        </div>
+                    </div>
+                    <div class="story-tags">
+                        <span>#亲子游</span>
+                        <span>#草原</span>
+                        <span>#民俗体验</span>
+                    </div>
+                </div>
+                <div class="story-item" data-tags="夏季 帕米尔高原 摄影 高原">
+                    <div class="story-header">
+                        <div class="story-avatar">🧔‍♂️</div>
+                        <div class="story-author">
+                            <h4>刘先生</h4>
+                            <p>户外爱好者</p>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <p>帕米尔高原的壮丽景色让我终生难忘。站在海拔4000多米的高度，望着远处的慕士塔格峰，感觉自己是那么渺小。喀拉库勒湖的湖水随着天气变化而变色，有时是湛蓝色，有时是碧绿色，仿佛一块巨大的宝石。在塔县，我住在当地的民宿里，品尝了塔吉克族的特色美食，听牧民讲述他们的生活故事。</p>
+                        <div class="read-more">
+                            <button>阅读更多</button>
+                        </div>
+                    </div>
+                    <div class="story-tags">
+                        <span>#帕米尔高原</span>
+                        <span>#摄影</span>
+                        <span>#高原</span>
+                    </div>
+                </div>
+                <div class="story-item" data-tags="夏季 吐鲁番 美食之旅">
+                    <div class="story-header">
+                        <div class="story-avatar">👩‍🍳</div>
+                        <div class="story-author">
+                            <h4>陈女士</h4>
+                            <p>美食博主</p>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <p>吐鲁番的美食让我流连忘返。在葡萄沟，我尝到了最甜的葡萄，品种繁多，口感各异。当地的维吾尔族阿姨教我如何制作葡萄干，还邀请我到她家做客，端上了手抓饭、烤包子、酸奶等特色美食。火焰山的炎热虽然让人难耐，但坎儿井的清凉泉水又让人倍感舒适。吐鲁番的美食之旅，是我新疆之行最难忘的部分。</p>
+                        <div class="read-more">
+                            <button>阅读更多</button>
+                        </div>
+                    </div>
+                    <div class="story-tags">
+                        <span>#吐鲁番</span>
+                        <span>#美食之旅</span>
+                        <span>#夏季</span>
+                    </div>
+                </div>
+                <div class="story-item" data-tags="夏季 赛里木湖 摄影">
+                    <div class="story-header">
+                        <div class="story-avatar">👩‍🎨</div>
+                        <div class="story-author">
+                            <h4>林小姐</h4>
+                            <p>艺术教师</p>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <p>赛里木湖的蓝是我见过最纯净的蓝，仿佛是天空掉落在了地上。我沿着湖边骑行，风吹过头发，感觉无比自由。傍晚，湖边的野花在夕阳下绽放，构成了一幅美丽的画卷。我在湖边支起画架，画下了这美丽的景色，仿佛置身于梦境中。赛里木湖的美，让我感受到了大自然的神奇与力量。</p>
+                        <div class="read-more">
+                            <button>阅读更多</button>
+                        </div>
+                    </div>
+                    <div class="story-tags">
+                        <span>#赛里木湖</span>
+                        <span>#摄影</span>
+                        <span>#夏季</span>
+                    </div>
+                </div>
+                <div class="story-item" data-tags="秋季 魔鬼城 摄影">
+                    <div class="story-header">
+                        <div class="story-avatar">👨‍🔬</div>
+                        <div class="story-author">
+                            <h4>赵先生</h4>
+                            <p>地质学家</p>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <p>魔鬼城的奇特地貌让我着迷。作为一名地质学家，我对这里的风蚀地貌进行了详细的观察。经过千万年的风吹日晒，这里的岩石形成了各种奇特的形状，有的像城堡，有的像怪兽，有的像宫殿。夕阳西下时，魔鬼城被染成了金黄色，更加显得神秘而壮观。我在这里拍摄了大量的照片，记录下了这大自然的杰作。</p>
+                        <div class="read-more">
+                            <button>阅读更多</button>
+                        </div>
+                    </div>
+                    <div class="story-tags">
+                        <span>#魔鬼城</span>
+                        <span>#摄影</span>
+                        <span>#秋季</span>
+                    </div>
+                </div>
+                <div class="story-item" data-tags="夏季 那拉提草原 民俗体验">
+                    <div class="story-header">
+                        <div class="story-avatar">👨‍🎵</div>
+                        <div class="story-author">
+                            <h4>孙先生</h4>
+                            <p>音乐教师</p>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <p>在那拉提草原，我感受到了哈萨克族的热情好客。牧民们邀请我到他们的蒙古包里做客，给我端上了奶茶、手抓肉等特色美食。晚上，我们围着篝火唱歌跳舞，牧民们弹奏着冬不拉，唱着传统的民歌。我也即兴演奏了一段小提琴，与当地的音乐产生了美妙的共鸣。那拉提草原的夜晚，是我新疆之行最难忘的夜晚。</p>
+                        <div class="read-more">
+                            <button>阅读更多</button>
+                        </div>
+                    </div>
+                    <div class="story-tags">
+                        <span>#那拉提草原</span>
+                        <span>#民俗体验</span>
+                        <span>#夏季</span>
+                    </div>
+                </div>
+                <div class="story-item" data-tags="秋季 禾木村 摄影">
+                    <div class="story-header">
+                        <div class="story-avatar">👩‍🎨</div>
+                        <div class="story-author">
+                            <h4>林女士</h4>
+                            <p>摄影师</p>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <p>禾木村的秋天简直就是童话世界，金黄的白桦林环绕着整个村庄，清晨的雾气让这里如仙境一般。我在这里住了一个星期，每天早起拍摄晨雾中的村庄，傍晚拍摄夕阳下的白桦林。当地的图瓦族居民非常友善，邀请我到他们家里喝奶茶，给我讲当地的故事。</p>
+                        <div class="read-more">
+                            <button>阅读更多</button>
+                        </div>
+                    </div>
+                    <div class="story-tags">
+                        <span>#禾木村</span>
+                        <span>#摄影</span>
+                        <span>#秋季</span>
+                    </div>
+                </div>
+                <div class="story-item" data-tags="夏季 赛里木湖 自驾">
+                    <div class="story-header">
+                        <div class="story-avatar">🚗</div>
+                        <div class="story-author">
+                            <h4>张先生</h4>
+                            <p>自驾爱好者</p>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <p>从乌鲁木齐出发，沿着连霍高速前往赛里木湖，一路风景如画。赛里木湖的蓝让我震撼，湖水清澈见底，周围的雪山倒映在湖中，构成了一幅完美的画卷。我在湖边露营了一晚，夜晚的星空美得让人窒息。</p>
+                        <div class="read-more">
+                            <button>阅读更多</button>
+                        </div>
+                    </div>
+                    <div class="story-tags">
+                        <span>#赛里木湖</span>
+                        <span>#自驾</span>
+                        <span>#夏季</span>
+                    </div>
+                </div>
+                <div class="story-item" data-tags="春季 喀什古城 文化体验 美食之旅">
+                    <div class="story-header">
+                        <div class="story-avatar">👨‍💼</div>
+                        <div class="story-author">
+                            <h4>王先生</h4>
+                            <p>文化学者</p>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <p>喀什古城是新疆最具民族特色的地方之一，这里保存着完整的维吾尔族传统建筑和文化。我在古城里漫步了三天，参观了艾提尕尔清真寺，品尝了当地的美食，与当地居民交流，了解了他们的生活方式和文化传统。</p>
+                        <div class="read-more">
+                            <button>阅读更多</button>
+                        </div>
+                    </div>
+                    <div class="story-tags">
+                        <span>#喀什古城</span>
+                        <span>#文化体验</span>
+                        <span>#美食之旅</span>
+                    </div>
+                </div>
+                <div class="story-item" data-tags="夏季 巴音布鲁克 摄影">
+                    <div class="story-header">
+                        <div class="story-avatar">📷</div>
+                        <div class="story-author">
+                            <h4>陈女士</h4>
+                            <p>摄影爱好者</p>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <p>巴音布鲁克的九曲十八弯是摄影爱好者的天堂，特别是日落时分，夕阳的余晖洒在蜿蜒的河面上，形成了绝美的光影效果。我在这里等待了三个小时，终于捕捉到了九个太阳倒影的奇观，这是我摄影生涯中最难忘的时刻。</p>
+                        <div class="read-more">
+                            <button>阅读更多</button>
+                        </div>
+                    </div>
+                    <div class="story-tags">
+                        <span>#巴音布鲁克</span>
+                        <span>#摄影</span>
+                        <span>#夏季</span>
+                    </div>
+                </div>
+                <div class="story-item" data-tags="冬季 天山 摄影 雪景">
+                    <div class="story-header">
+                        <div class="story-avatar">❄️</div>
+                        <div class="story-author">
+                            <h4>周先生</h4>
+                            <p>风光摄影师</p>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <p>冬季的天山完全是另一个世界，白雪覆盖的山峰在阳光下闪闪发光，宛如童话仙境。我在天池边等待了三天，终于等到了一场大雪，整个天池变成了一片银装素裹的世界。清晨的阳光洒在雪地上，折射出五彩的光芒，我用相机记录下了这难得一见的美景。</p>
+                        <div class="read-more">
+                            <button>阅读更多</button>
+                        </div>
+                    </div>
+                    <div class="story-tags">
+                        <span>#天山</span>
+                        <span>#雪景</span>
+                        <span>#摄影</span>
+                        <span>#冬季</span>
+                    </div>
+                </div>
+                <div class="story-item" data-tags="冬季 滑雪 温泉 休闲">
+                    <div class="story-header">
+                        <div class="story-avatar">🏂</div>
+                        <div class="story-author">
+                            <h4>吴小姐</h4>
+                            <p>滑雪爱好者</p>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <p>谁说新疆只有夏天好玩？冬天的新疆才是我的最爱！在丝绸之路滑雪场，从山顶滑下的感觉太棒了，雪道又宽又长，雪质松软。滑完雪后，去附近的温泉泡一泡，冰火两重天的感觉太舒服了。晚上还可以在滑雪场的木屋里吃手抓肉，喝热腾腾的奶茶，这才是冬天的正确打开方式！</p>
+                        <div class="read-more">
+                            <button>阅读更多</button>
+                        </div>
+                    </div>
+                    <div class="story-tags">
+                        <span>#滑雪</span>
+                        <span>#温泉</span>
+                        <span>#休闲</span>
+                        <span>#冬季</span>
+                    </div>
+                </div>
+                <div class="story-item" data-tags="冬季 喀纳斯 禾木 雪景 摄影">
+                    <div class="story-header">
+                        <div class="story-avatar">🏔️</div>
+                        <div class="story-author">
+                            <h4>郑先生</h4>
+                            <p>冬季探险者</p>
+                        </div>
+                    </div>
+                    <div class="story-content">
+                        <p>冬季的喀纳斯和禾木是真正的人间仙境！整个村庄被厚厚的白雪覆盖，木屋的烟囱冒着袅袅炊烟，图瓦族人在雪地里骑马穿行。我在这里住了一个星期，每天清晨踩着没膝的深雪去拍晨雾，傍晚在雪地里等待日落。晚上坐在木屋里，听着窗外的风雪声，喝着图瓦族人家酿的奶酒，感觉自己进入了一个童话世界。</p>
+                        <div class="read-more">
+                            <button>阅读更多</button>
+                        </div>
+                    </div>
+                    <div class="story-tags">
+                        <span>#喀纳斯</span>
+                        <span>#禾木</span>
+                        <span>#雪景</span>
+                        <span>#摄影</span>
+                        <span>#冬季</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- 精选游记 -->
+    <section class="travel-articles">
+        <h3>精选游记</h3>
+        <div class="travel-content">
+            <!-- 上传游记表单 -->
+            <div class="upload-story-small">
+                <h4>分享你的游记</h4>
+                <p>分享你在新疆的旅行经历，帮助其他旅行者</p>
+                <div class="upload-form">
+                    <form id="story-upload-form">
+                        <div class="form-group">
+                            <label for="author-name">你的名字</label>
+                            <input type="text" id="author-name" name="author-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="author-role">你的身份</label>
+                            <input type="text" id="author-role" name="author-role" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="story-title">游记标题</label>
+                            <input type="text" id="story-title" name="story-title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="story-content">游记内容</label>
+                            <textarea id="story-content" name="story-content" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="story-tags">标签</label>
+                            <input type="text" id="story-tags" name="story-tags" placeholder="喀什古城 摄影 美食">
+                        </div>
+                        <div class="form-group">
+                            <label for="story-avatar">选择头像</label>
+                            <select id="story-avatar" name="story-avatar" required>
+                                <option value="👩‍💼">👩‍💼</option>
+                                <option value="👨‍🚀">👨‍🚀</option>
+                                <option value="👪">👪</option>
+                                <option value="🧔‍♂️">🧔‍♂️</option>
+                                <option value="👩‍🍳">👩‍🍳</option>
+                                <option value="👩‍🎨">👩‍🎨</option>
+                                <option value="👨‍🔬">👨‍🔬</option>
+                                <option value="👨‍🎵">👨‍🎵</option>
+                                <option value="📷">📷</option>
+                                <option value="🚗">🚗</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary">上传游记</button>
+                    </form>
+                    <div id="upload-success" class="success-message">
+                        <p>🎉 游记上传成功！感谢你的分享！</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="travel-grid">
+                <div class="travel-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Kashgar%20old%20city%20traditional%20architecture&image_size=portrait_4_3" alt="喀什古城游记">
+                    <h4>喀什古城的小巷时光</h4>
+                    <p>在喀什古城的小巷里迷路是一种幸福，每一条巷子都藏着不同的惊喜。维吾尔族老人坐在门口晒太阳，孩子们在巷子里奔跑，空气中弥漫着烤包子的香气。在这里，时间仿佛慢了下来，让我真正感受到了新疆的烟火气。</p>
+                </div>
+                <div class="travel-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Tianchi%20Lake%20mountain%20scenery&image_size=portrait_4_3" alt="天山天池游记">
+                    <h4>天池边的遇见</h4>
+                    <p>清晨的天池像一面镜子，倒映着博格达峰的身影。我在湖边遇到了一位当地的哈萨克族牧民，他邀请我喝了一碗热奶茶，还给我讲了关于天池的传说。那一刻，我觉得自己与这片土地有了更深的连接。</p>
+                </div>
+                <div class="travel-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Bayanbulak%20Grassland%20sunset&image_size=portrait_4_3" alt="巴音布鲁克草原游记">
+                    <h4>九曲十八弯的日落</h4>
+                    <p>为了看巴音布鲁克的日落，我们在草原上等到了傍晚。当夕阳西下时，九曲十八弯的河面上出现了九个太阳的倒影，美得让人窒息。牧民们骑着马从远处归来，构成了一幅完美的草原画卷。</p>
+                </div>
+                <div class="travel-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Devil%20City%20wind%20eroded%20landforms&image_size=portrait_4_3" alt="魔鬼城游记">
+                    <h4>魔鬼城的风声</h4>
+                    <p>在魔鬼城遇到了大风，风声在岩石间穿梭，真的像魔鬼在低语。我沿着栈道漫步，仿佛走进了一个外星世界。夕阳下的魔鬼城更是壮观，红色的岩石被染成了金色，让人流连忘返。</p>
+                </div>
+                <div class="travel-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Turpan%20Grape%20Valley%20vineyards&image_size=portrait_4_3" alt="吐鲁番葡萄沟游记">
+                    <h4>葡萄沟的甜蜜时光</h4>
+                    <p>在葡萄沟，我尝到了最甜的葡萄。维吾尔族阿姨热情地邀请我到她家做客，端上了刚摘的葡萄和自制的酸奶。坐在葡萄架下，听着她讲述葡萄的故事，感觉整个世界都充满了甜蜜。</p>
+                </div>
+                <div class="travel-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Kanas%20Lake%20autumn%20scenery&image_size=portrait_4_3" alt="喀纳斯湖游记">
+                    <h4>喀纳斯的秋</h4>
+                    <p>秋天的喀纳斯是童话世界，白桦林变成了金黄色，湖水呈现出不同层次的蓝色。我沿着湖边徒步，遇到了图瓦族的小朋友，他们给我看了他们的小木屋，还教我唱了当地的民歌。</p>
+                </div>
+                <div class="travel-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Kuche%20Grand%20Canyon%20red%20rocks&image_size=portrait_4_3" alt="库车大峡谷游记">
+                    <h4>大峡谷的震撼</h4>
+                    <p>库车大峡谷的红色岩石让我震撼，仿佛走进了一个红色的迷宫。阳光从峡谷顶部洒下来，形成了美丽的光影效果。我在峡谷中漫步，感受着大自然的鬼斧神工，心中充满了敬畏。</p>
+                </div>
+                <div class="travel-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Pamir%20Plateau%20mountain%20scenery&image_size=portrait_4_3" alt="帕米尔高原游记">
+                    <h4>帕米尔的高原反应</h4>
+                    <p>在帕米尔高原，我经历了轻微的高原反应，但看到慕士塔格峰的那一刻，一切都值得了。喀拉库勒湖的湖水随着天气变化而变色，有时是蓝色，有时是绿色。在这里，我感受到了高原的神圣与宁静。</p>
+                </div>
+                <div class="travel-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Nalati%20Grassland%20scenery&image_size=portrait_4_3" alt="那拉提草原游记">
+                    <h4>那拉提的马背时光</h4>
+                    <p>在那拉提草原，我第一次骑马，牧民大哥教我如何控制马的方向。骑在马背上，看着一望无际的草原，感觉自己像个真正的牧民。晚上，我们在蒙古包里吃手抓肉，喝马奶酒，度过了一个难忘的夜晚。</p>
+                </div>
+                <div class="travel-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Sayram%20Lake%20blue%20water%20mountain%20scenery&image_size=portrait_4_3" alt="赛里木湖游记">
+                    <h4>赛里木湖的蓝</h4>
+                    <p>赛里木湖的蓝是我见过最纯净的蓝，仿佛是天空掉落在了地上。我沿着湖边骑行，风吹过头发，感觉无比自由。傍晚，湖边的野花在夕阳下绽放，构成了一幅美丽的画卷。</p>
+                </div>
+                <div class="travel-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Taklamakan%20Desert%20sand%20dunes&image_size=portrait_4_3" alt="塔克拉玛干沙漠游记">
+                    <h4>沙漠中的星空</h4>
+                    <p>在塔克拉玛干沙漠露营，晚上的星空美得让人窒息。没有光污染，星星仿佛触手可及。我们在沙漠中烧烤，听向导讲述沙漠的故事。凌晨，我们爬上沙丘看日出，看着太阳从沙漠边缘升起，感觉生命充满了希望。</p>
+                </div>
+                <div class="travel-item">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Yili%20Valley%20spring%20flowers&image_size=portrait_4_3" alt="伊犁河谷游记">
+                    <h4>伊犁的花海</h4>
+                    <p>春天的伊犁河谷是花的海洋，郁金香、杏花、油菜花竞相开放。我在花田中漫步，呼吸着花香，感觉自己置身于童话世界。当地的哈萨克族牧民邀请我到他们的帐篷里做客，给我端上了奶茶和手抓饭。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 旅行装备清单 -->
+    <section class="travel-gear">
+        <h3>旅行装备清单</h3>
+        <p>根据不同季节和目的地，准备合适的装备</p>
+        
+        <!-- 图表容器 -->
+        <div class="charts-container">
+            <!-- 新疆旅游人数变化图表 -->
+            <section class="chart-item">
+                <h3>新疆旅游人数变化</h3>
+                <div class="chart-container">
+                    <canvas id="tourismCanvas"></canvas>
+                </div>
+            </section>
+            
+            <!-- 新疆全年温度变化图表 -->
+            <section class="chart-item">
+                <h3>新疆全年温度变化</h3>
+                <div class="chart-container">
+                    <canvas id="temperatureCanvas"></canvas>
+                </div>
+            </section>
+            
+            <!-- 新疆旅游收入变化图表 -->
+            <section class="chart-item">
+                <h3>新疆旅游收入变化</h3>
+                <div class="chart-container">
+                    <canvas id="revenueCanvas"></canvas>
+                </div>
+            </section>
+        </div>
+        
+        <div class="gear-grid">
+            <div class="gear-card active">
+                <h4>🌤️ 通用装备</h4>
+                <ul>
+                    <li>身份证和边防证</li>
+                    <li>防晒霜（SPF50+）</li>
+                    <li>墨镜和遮阳帽</li>
+                    <li>舒适的运动鞋</li>
+                    <li>便携水杯</li>
+                    <li>常用药品（感冒药、肠胃药、创可贴）</li>
+                    <li>个人洗漱用品</li>
+                    <li>多功能背包</li>
+                    <li>雨具（雨伞或雨衣）</li>
+                    <li>保暖衣物（薄外套）</li>
+                    <li>便携充电器</li>
+                    <li>地图或旅游指南</li>
+                </ul>
+            </div>
+            <div class="gear-card">
+                <h4>🌡️ 季节装备</h4>
+                <ul>
+                    <li>夏季：短袖、短裤、驱蚊液、防晒衣、太阳镜</li>
+                    <li>夏季：凉帽、沙滩鞋、游泳装备</li>
+                    <li>秋季：长袖衬衫、薄外套、卫衣、牛仔裤</li>
+                    <li>秋季：围巾、手套、轻便夹克</li>
+                    <li>冬季：羽绒服、保暖内衣、防滑靴、厚毛衣</li>
+                    <li>冬季：帽子、手套、围巾、暖宝宝</li>
+                    <li>春季：冲锋衣、薄毛衣、长袖T恤、轻便外套</li>
+                    <li>春季：防水鞋、雨伞、防风外套</li>
+                </ul>
+            </div>
+            <div class="gear-card">
+                <h4>📷 摄影装备</h4>
+                <ul>
+                    <li>相机或手机</li>
+                    <li>备用电池（至少2块）</li>
+                    <li>大容量存储卡（128GB以上）</li>
+                    <li>三脚架（轻便型）</li>
+                    <li>镜头清洁布和镜头纸</li>
+                    <li>相机包或保护套</li>
+                    <li>镜头（广角、长焦）</li>
+                    <li>滤镜（UV镜、偏振镜）</li>
+                    <li>快门线或遥控器</li>
+                    <li>反光板（小型）</li>
+                    <li>充电宝</li>
+                    <li>防水袋（保护设备）</li>
+                </ul>
+            </div>
+            <div class="gear-card">
+                <h4>🚗 自驾装备</h4>
+                <ul>
+                    <li>行车证和驾驶证</li>
+                    <li>车辆工具包（扳手、螺丝刀等）</li>
+                    <li>导航设备（GPS或手机支架）</li>
+                    <li>应急食品和水（至少3天量）</li>
+                    <li>备胎和千斤顶</li>
+                    <li>充气泵和补胎工具</li>
+                    <li>急救包</li>
+                    <li>灭火器</li>
+                    <li>手电筒和备用电池</li>
+                    <li>拖车绳</li>
+                    <li>防滑链（冬季）</li>
+                    <li>车载充电器</li>
+                    <li>地图和路线规划</li>
+                    <li>车辆保险单</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <h3>新疆民族文化数字化平台</h3>
+                <p>弘扬民族文化，促进文旅融合</p>
+            </div>
+            <div class="footer-links">
+                <ul>
+                    <li><a href="index.html#home">疆来·阿达西</a></li>
+                    <li><a href="index.html#ethnic">疆俗·看民俗</a></li>
+                    <li><a href="index.html#timeline">疆历·过节日</a></li>
+                    <li><a href="index.html#map">疆域·逛南北</a></li>
+                    <li><a href="food.html">疆味·香满口</a></li>
+                    <li><a href="architecture.html">疆筑·赏建筑</a></li>
+                    <li><a href="travel.html">疆行·品游记</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 疆来筑迹 版权所有</p>
+        </div>
+    </footer>
+
+    <!-- 回到顶部按钮 -->
+    <button id="back-to-top" class="back-to-top" title="回到顶部">⬆ 返回顶部</button>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,2514 @@
+﻿﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>疆筑·赏建筑 - 疆来筑迹</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <style>
+        /* ============ CSS Variables ============ */
+        :root {
+            --chart-box-bg: rgba(255, 255, 255, 0.88);
+            --chart-box-radius: 14px;
+            --chart-box-padding: 1.25rem;
+            --chart-box-shadow: 0 2px 16px rgba(139, 69, 19, 0.06);
+            --chart-box-shadow-hover: 0 6px 28px rgba(139, 69, 19, 0.12);
+            --chart-box-border: 1px solid rgba(139, 69, 19, 0.07);
+            --chart-height-standard: 400px;
+            --chart-height-compact: 360px;
+            --chart-height-large: 440px;
+            --row-gap: 1.25rem;
+            --section-gap: 1.5rem;
+            --color-primary: #8B4513;
+            --color-gold: #DAA520;
+            --color-sienna: #A0522D;
+            --color-crimson: #B22234;
+            --color-olive: #556B2F;
+            --color-teal: #2A9D8F;
+            --color-purple: #764BA2;
+            --font-heading: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+        }
+
+        /* ============ Chart Box (unified card) ============ */
+        .arch-chart-box {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            background: var(--chart-box-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: var(--chart-box-radius);
+            padding: var(--chart-box-padding);
+            box-shadow: var(--chart-box-shadow);
+            border: var(--chart-box-border);
+            transition: box-shadow 0.35s ease, transform 0.35s ease;
+        }
+        .arch-chart-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-gold), var(--color-sienna));
+            opacity: 0.55;
+            border-radius: 3px 3px 0 0;
+        }
+        .arch-chart-box:hover {
+            box-shadow: var(--chart-box-shadow-hover);
+            transform: translateY(-2px);
+        }
+        .arch-chart-box h5 {
+            color: var(--color-primary);
+            font-family: var(--font-heading);
+            font-size: 0.95rem;
+            margin: 0.25rem 0 0.75rem;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 0.4px;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed rgba(218, 165, 32, 0.35);
+        }
+
+        /* ============ Chart Row (flex grid) ============ */
+        .arch-chart-row {
+            display: flex;
+            gap: var(--row-gap);
+            margin-bottom: var(--row-gap);
+        }
+        .arch-chart-row .arch-chart-box {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* ============ ECharts containers (unified heights) ============ */
+        .echart-container       { width: 100%; height: 360px; }
+        .echart-container-tall  { width: 100%; height: 430px; }
+        .echart-container-wide  { width: 100%; height: 430px; }
+        .echart-container-chord { width: 100%; height: 500px; }
+
+        /* 和弦图独占一行，宽度100% */
+        .arch-chord-row { justify-content: center; }
+        .arch-chord-box { flex: 0 0 100% !important; max-width: 100% !important; }
+
+        /* Override style.css canvas restriction for ECharts */
+        .arch-chart-box canvas,
+        .arch-climate-chart-side canvas,
+        .arch-fusion-chart-side canvas,
+        .arch-heritage-chart-side canvas,
+        .arch-type-era-chart canvas {
+            max-height: none !important;
+        }
+
+        /* 类型×年代 联动布局 */
+        .arch-type-era-link {
+            display: flex;
+            gap: 1rem;
+            align-items: stretch;
+            margin-bottom: 1.5rem;
+        }
+        .arch-type-era-chart {
+            flex: 1;
+            min-width: 0;
+            background: linear-gradient(160deg, rgba(255,255,255,0.95), rgba(249,245,235,0.9));
+            border-radius: 10px;
+            padding: 0.8rem;
+            box-shadow: 0 2px 10px rgba(139,69,19,0.08);
+            border: 1px solid rgba(218,165,32,0.2);
+        }
+        .arch-type-era-text {
+            flex: 0 0 280px;
+            position: relative;
+            min-height: 360px;
+        }
+        .type-era-card {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(160deg, rgba(255,250,240,0.98), rgba(249,245,235,0.95));
+            border-radius: 12px;
+            padding: 1.2rem;
+            box-shadow: 0 4px 14px rgba(139,69,19,0.12);
+            border: 1px solid rgba(218,165,32,0.3);
+            border-left: 5px solid #B22222;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .type-era-card.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .type-era-icon {
+            width: 52px; height: 52px;
+            margin: 0 0 0.8rem;
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            font-size: 1.4rem; font-weight: bold;
+            box-shadow: 0 3px 10px rgba(139,69,19,0.3);
+        }
+        .type-era-card h4 {
+            color: #8B4513;
+            font-size: 1.15rem;
+            margin: 0 0 0.6rem;
+            font-weight: 600;
+        }
+        .type-era-card p {
+            color: #5D4037;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin: 0 0 0.6rem;
+            text-align: justify;
+        }
+        .type-era-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+        .type-era-tags span {
+            display: inline-block;
+            padding: 0.15rem 0.6rem;
+            font-size: 0.72rem;
+            border-radius: 10px;
+            background: rgba(218,165,32,0.15);
+            color: #8B4513;
+            border: 1px solid rgba(218,165,32,0.3);
+        }
+
+        /* 融合板块：顶部对齐 */
+        .arch-fusion-compact { align-items: flex-start; }
+        .arch-fusion-text-side { justify-content: flex-start; }
+
+        /* 右侧两图并排 */
+        .arch-fusion-charts-row { flex-direction: row; gap: 0.8rem; padding: 0.8rem; }
+        .arch-fusion-chart-item { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+        .arch-fusion-chart-item:last-child { flex: 1.4; }
+        .arch-fusion-chart-item h5 { margin-bottom: 0.4rem; }
+
+        /* 和弦图左右布局 */
+        .arch-chord-layout { display: flex; gap: 1rem; align-items: flex-start; }
+        .arch-chord-info-side { flex: 0 0 280px; display: flex; flex-direction: column; gap: 0.6rem; }
+        .arch-chord-info-card {
+            display: flex; gap: 0.7rem; align-items: stretch;
+            background: linear-gradient(160deg, rgba(255,252,245,0.95), rgba(248,240,227,0.9));
+            border-radius: 10px; padding: 0.7rem;
+            border: 1px solid rgba(218,165,32,0.25);
+            box-shadow: 0 2px 8px rgba(139,69,19,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .arch-chord-info-card:hover { transform: translateX(4px); box-shadow: 0 4px 14px rgba(139,69,19,0.15); }
+        .arch-chord-info-icon {
+            flex: 0 0 48px; height: 48px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 0.7rem; font-weight: bold;
+            text-align: center; line-height: 1.1;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .arch-chord-info-text { flex: 1; min-width: 0; }
+        .arch-chord-info-text h5 { color: #8B4513; font-size: 0.9rem; margin: 0 0 0.3rem; font-weight: 600; }
+        .arch-chord-info-text p { color: #5D4037; font-size: 0.78rem; line-height: 1.5; margin: 0; }
+        .arch-chord-info-text strong { color: #B22234; font-weight: 700; }
+        .arch-chord-chart-side { flex: 1; min-width: 0; }
+
+        /* ============ Algo Section ============ */
+        .algo-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            font-size: 0.68rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+            margin-left: 4px;
+            vertical-align: middle;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        .algo-section {
+            background: linear-gradient(135deg, rgba(102,126,234,0.04), rgba(118,75,162,0.05), rgba(139,69,19,0.02));
+            border-radius: 18px;
+            padding: 1.75rem;
+            margin: 2rem 0;
+            border: 1px solid rgba(102,126,234,0.12);
+            position: relative;
+            overflow: hidden;
+        }
+        .algo-section::before {
+            content: '';
+            position: absolute;
+            top: -30px; right: -30px;
+            width: 120px; height: 120px;
+            background: radial-gradient(circle, rgba(118,75,162,0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .algo-section h3 {
+            text-align: center;
+            color: #5a4a8a;
+            margin-bottom: 1.25rem;
+            font-size: 1.2rem;
+            font-family: var(--font-heading);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        /* ============ Climate Fusion (image+chart row) ============ */
+        .arch-climate-fusion {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: stretch;
+            padding: 0.6rem;
+            background: rgba(255,255,255,0.85);
+            border-radius: 10px;
+            border: 1px solid rgba(218,165,32,0.15);
+            box-shadow: 0 2px 8px rgba(139,69,19,0.06);
+        }
+        .arch-climate-chart-side {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .arch-climate-chart-side h5 {
+            font-size: 0.75rem;
+            margin: 0 0 0.3rem;
+            color: #8B4513;
+            text-align: center;
+            padding-bottom: 0.2rem;
+            border-bottom: 1px dashed rgba(218,165,32,0.3);
+        }
+        .arch-climate-chart-side .echart-container {
+            width: 100%;
+            height: 260px;
+        }
+        .arch-climate-chart-note {
+            font-size: 0.65rem;
+            color: #888;
+            text-align: center;
+            margin: 0.2rem 0 0;
+        }
+        .arch-climate-fusion .arch-climate-text-side {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 0.6rem;
+            padding-top: 0.3rem;
+        }
+        .arch-climate-icon-mini {
+            width: 36px;
+            height: 36px;
+            font-size: 0.85rem;
+        }
+        .arch-climate-fusion .arch-climate-text-side img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+        .arch-climate-fusion .arch-climate-text-side h4 {
+            font-size: 0.85rem;
+            margin: 0 0 0.2rem;
+            color: #8B4513;
+        }
+        .arch-climate-fusion .arch-climate-text-side p {
+            font-size: 0.7rem;
+            line-height: 1.4;
+            margin: 0;
+            color: #5D4037;
+        }
+        .arch-climate-slide-tag {
+            font-size: 0.62rem;
+            padding: 2px 8px;
+        }
+        .arch-climate-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+        }
+
+        /* ============ Heritage Link (radar + cards) ============ */
+        .arch-heritage-link {
+            gap: 1.25rem;
+            align-items: stretch;
+        }
+        .arch-heritage-chart-side {
+            flex: 1.7;
+            min-width: 340px;
+        }
+        .arch-heritage-cards-side {
+            flex: 0.8;
+            min-width: 260px;
+        }
+
+        /* ============ Fusion Compact ============ */
+        .arch-fusion-compact {
+            gap: 1.25rem;
+            align-items: center;
+        }
+        .arch-fusion-chart-side {
+            flex: 1;
+            min-width: 300px;
+        }
+        .arch-fusion-text-side {
+            flex: 0 0 320px;
+        }
+
+        /* ============ Stats / Key Facts ============ */
+        .arch-key-facts {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .arch-fact-item {
+            background: linear-gradient(145deg, rgba(255,255,255,0.9), rgba(248,240,227,0.7));
+            border-radius: 14px;
+            padding: 1.25rem 0.8rem;
+            text-align: center;
+            border: 1px solid rgba(218,165,32,0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .arch-fact-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(139,69,19,0.12);
+        }
+        .arch-fact-number {
+            display: block;
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #8B4513, #DAA520);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+        .arch-fact-label {
+            display: block;
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 0.3rem;
+            letter-spacing: 0.3px;
+        }
+
+        /* ============ Section spacing rhythm ============ */
+        .architecture-section {
+            padding: 5rem 1.5rem 2rem;
+            width: 100%;
+            margin-top: 0;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
+        }
+        .arch-block {
+            margin-bottom: 2.5rem;
+        }
+        .arch-climate-data {
+            margin: 1.5rem 0;
+        }
+        .arch-climate-data h4 {
+            font-size: 1.15rem;
+            margin-bottom: 1.25rem;
+        }
+
+        /* ============ Conclusion ============ */
+        .conclusion.full-width {
+            margin: 1.25rem 0;
+            padding: 1rem;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid rgba(218,165,32,0.2);
+        }
+        .conclusion-text {
+            font-size: 1.05rem;
+            letter-spacing: 1px;
+        }
+
+        /* ============ Arch Cards Layout ============ */
+        .arch-cards {
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            overflow: visible;
+            padding: 0.75rem 0.3rem;
+            gap: 0.5rem;
+            align-items: stretch;
+        }
+        .arch-cards-charts {
+            display: flex;
+            gap: 0.5rem;
+            width: 100%;
+        }
+        .arch-cards-charts .arch-chart-box {
+            flex: 1;
+            min-width: 0;
+            padding: 0.5rem;
+            --chart-box-radius: 10px;
+            --chart-box-padding: 0.5rem;
+        }
+        .arch-cards-charts .arch-chart-box h5 {
+            font-size: 0.7rem;
+            margin: 0.1rem 0 0.3rem;
+            padding-bottom: 0.2rem;
+            letter-spacing: 0.2px;
+        }
+        .arch-cards-charts .echart-container-tall {
+            height: 220px;
+        }
+        .arch-cards-row {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow: visible;
+            gap: 0;
+            align-items: center;
+            width: 100%;
+        }
+        .arch-cards-row .arch-card {
+            flex: 1;
+            min-width: 0;
+            background-color: rgba(249, 249, 249, 0.98);
+            border-radius: 10px;
+            overflow: visible;
+            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.14);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, z-index 0s;
+            border: 1px solid rgba(218, 165, 32, 0.25);
+            margin-left: -30px;
+            position: relative;
+            z-index: 1;
+        }
+        .arch-cards-row .arch-card:first-child {
+            margin-left: 0;
+        }
+        .arch-cards-row .arch-card:nth-child(even) {
+            transform: translateY(15px);
+        }
+        .arch-cards-row .arch-card:nth-child(even):hover {
+            transform: translateY(5px) scale(1.02);
+            box-shadow: 0 12px 24px rgba(139, 69, 19, 0.25);
+            z-index: 10;
+        }
+        .arch-cards-row .arch-card:nth-child(odd):hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 24px rgba(139, 69, 19, 0.25);
+            z-index: 10;
+        }
+        .arch-cards-row .arch-card-image img {
+            height: 80px;
+            object-fit: cover;
+        }
+        .arch-cards-row .arch-card-body {
+            padding: 0.6rem 0.7rem;
+        }
+        .arch-cards-row .arch-card-body h4 {
+            font-size: 0.85rem;
+            margin: 0 0 0.3rem;
+        }
+        .arch-cards-row .arch-card-body p {
+            font-size: 0.72rem;
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        /* ============ Responsive ============ */
+        @media (max-width: 1024px) {
+            .arch-chart-row { flex-wrap: wrap; }
+            .arch-chart-row .arch-chart-box { flex: 0 0 calc(50% - 0.625rem); }
+            .arch-key-facts { grid-template-columns: repeat(2, 1fr); }
+            .arch-heritage-link { flex-direction: column; }
+            .arch-fusion-compact { flex-direction: column; }
+            .arch-fusion-text-side { flex: auto; }
+            .arch-climate-fusion .arch-climate-text-side { flex: auto; }
+        }
+        @media (max-width: 768px) {
+            .arch-chart-row { flex-direction: column; }
+            .arch-chart-row .arch-chart-box { flex: 1; }
+            .echart-container, .echart-container-tall, .echart-container-wide {
+                height: 340px;
+            }
+            .architecture-section { padding: 4rem 0.75rem 1.5rem; }
+            .arch-climate-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 左侧悬浮导航栏 -->
+    <nav class="side-nav">
+        <ul>
+            <li><a href="home.html">疆来·阿达西</a></li>
+            <li><a href="landscape.html">疆蕴·观地貌</a></li>
+            <li><a href="architecture.html">疆筑·赏建筑</a></li>
+            <li><a href="ethnic.html">疆俗·看民俗</a></li>
+            <li><a href="timeline.html">疆历·过节日</a></li>
+            <li><a href="food.html">疆味·香满口</a></li>
+            <li><a href="map.html">疆域·逛南北</a></li>
+            <li><a href="travel.html">疆行·品游记</a></li>
+        </ul>
+    </nav>
+
+    <header class="header">
+        <div class="logo">疆来筑迹</div>
+        <nav class="nav">
+            <ul>
+                <li><a href="home.html">疆来·阿达西</a></li>
+                <li><a href="landscape.html">疆蕴·观地貌</a></li>
+                <li><a href="architecture.html">疆筑·赏建筑</a></li>
+                <li><a href="ethnic.html">疆俗·看民俗</a></li>
+                <li><a href="timeline.html">疆历·过节日</a></li>
+                <li><a href="food.html">疆味·香满口</a></li>
+                <li><a href="map.html">疆域·逛南北</a></li>
+                <li><a href="travel.html">疆行·品游记</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- 背景音乐 -->
+    <audio id="background-music" loop autoplay>
+        <source src="新疆美丽公主组合 - Oynasun.mp3" type="audio/mpeg">
+        您的浏览器不支持音频播放
+    </audio>
+    <div class="music-control">
+        <button id="music-toggle" class="music-btn">🔊</button>
+    </div>
+
+    <section id="architecture" class="architecture-section">
+        <h2>疆筑·赏建筑</h2>
+
+        <!-- 新疆建筑简介 -->
+        <div class="xinjiang-intro">
+            <div class="intro-content">
+                <h3>中原营造思想与新疆建筑的融合</h3>
+                <p>新疆建筑是丝绸之路文化交融的结晶。汉唐及清代，中原地区的城坊规划、营造技术通过丝绸之路传入西域，与本地民族建筑传统深度融合，形成了独具特色的建筑风格。</p>
+                <p>从交河故城的生土夯筑到惠远古城的官式营造，从"阿以旺"民居的天窗采光到喀什老城的街巷布局，新疆建筑诠释着中华民族多元一体的文化共生与传承。</p>
+            </div>
+            <div class="intro-image">
+                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Kashgar%20old%20city%20traditional%20Uyghur%20architecture%20earthen%20buildings%20aerial%20view&image_size=landscape_16_9" alt="新疆传统建筑">
+            </div>
+        </div>
+
+        <!-- 点睛结语 -->
+        <div class="conclusion full-width">
+            <p class="conclusion-text">丝路驼铃传匠意，中原西域共筑魂——一砖一木皆是文明交融的见证</p>
+        </div>
+
+        <!-- ===== 高级算法分析板块 ===== -->
+        <div class="algo-section">
+            <h3>🔬 多维数据分析引擎 <span class="algo-badge">相关性分析</span></h3>
+            <div class="arch-chart-row">
+                <div class="arch-chart-box" style="flex:1.5">
+                    <h5>Pearson 特征相关性热力图</h5>
+                    <div id="correlationHeatmap" class="echart-container-tall"></div>
+                </div>
+                <div class="arch-chart-box">
+                    <h5>建筑特征多维平行坐标</h5>
+                    <div id="parallelCoords" class="echart-container-tall"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 建筑类型概览 -->
+        <div class="arch-block">
+            <div class="arch-block-title">
+                <span class="arch-block-number">序</span>
+                <h3>新疆建筑类型概览</h3>
+            </div>
+            <p class="arch-block-desc">新疆建筑按功能可分为城址、民居、军事、官式四大类型，各类型在分布区域、建造工艺与文化特征上各有特色，共同构成中华民族共同体建筑文化的重要篇章。</p>
+
+            <!-- 类型分布与年代图表 -->
+            <div class="arch-climate-data">
+                <h4>新疆建筑类型与年代分布</h4>
+                <div class="arch-type-era-link">
+                    <div class="arch-type-era-chart">
+                        <h5>建筑类型占比（旭日图）</h5>
+                        <div id="typeSunburstChart" class="echart-container"></div>
+                    </div>
+                    <div class="arch-type-era-text" id="typeEraText">
+                        <div class="type-era-card active" data-source="type" data-index="0">
+                            <div class="type-era-icon" style="background:linear-gradient(135deg,#A0522D,#8B4513);">城</div>
+                            <h4>城址建筑</h4>
+                            <p>交河故城、高昌故城、北庭故城、惠远古城等，多采用生土夯筑，布局受中原城坊制度深刻影响。城池呈方形或矩形，分内外城，体现中原都城规制在西域的实践。</p>
+                            <div class="type-era-tags"><span>生土夯筑</span><span>里坊制度</span><span>世界遗产</span></div>
+                        </div>
+                        <div class="type-era-card" data-source="type" data-index="1">
+                            <div class="type-era-icon" style="background:linear-gradient(135deg,#7A9B4F,#556B2F);">居</div>
+                            <h4>民居建筑</h4>
+                            <p>以"阿以旺"民居为代表，带天窗的夏室为核心，厚墙小窗适应干旱气候，融合中原木作工艺。内向封闭布局，外廊连接各室，体现西域人居智慧。</p>
+                            <div class="type-era-tags"><span>阿以旺</span><span>厚墙小窗</span><span>中原木构</span></div>
+                        </div>
+                        <div class="type-era-card" data-source="type" data-index="2">
+                            <div class="type-era-icon" style="background:linear-gradient(135deg,#5C7A36,#3D5A1A);">军</div>
+                            <h4>军事建筑</h4>
+                            <p>烽燧、关隘、城堡等，如克孜尔尕哈烽燧，沿丝绸之路分布，是中央政权管辖西域的历史见证。夯土版筑，形制规整，兼具防御与通信功能。</p>
+                            <div class="type-era-tags"><span>烽燧</span><span>丝绸之路</span><span>中央管辖</span></div>
+                        </div>
+                        <div class="type-era-card" data-source="type" data-index="3">
+                            <div class="type-era-icon" style="background:linear-gradient(135deg,#CD853F,#8B4513);">官</div>
+                            <h4>官式建筑</h4>
+                            <p>惠远古城将军府、钟鼓楼、文庙等，严格遵循清代《工程做法》，是中原官式建筑在西域的直接移植。斗拱飞檐、雕梁画栋，体现中原营造体系的影响。</p>
+                            <div class="type-era-tags"><span>官式做法</span><span>斗拱飞檐</span><span>工程做法</span></div>
+                        </div>
+                        <div class="type-era-card" data-source="era" data-index="0">
+                            <div class="type-era-icon" style="background:linear-gradient(135deg,#DAA520,#B8860B);">汉</div>
+                            <h4>汉代 · 8处</h4>
+                            <p>西域都护府设立，中原筑城思想初传西域。交河故城始建，生土夯筑技术奠定新疆建筑基础，丝绸之路开通带来建筑文化交流。</p>
+                            <div class="type-era-tags"><span>西域都护府</span><span>丝路开通</span></div>
+                        </div>
+                        <div class="type-era-card" data-source="era" data-index="1">
+                            <div class="type-era-icon" style="background:linear-gradient(135deg,#CD853F,#A0522D);">魏</div>
+                            <h4>魏晋 · 12处</h4>
+                            <p>各民族割据政权并存，建筑融合多元文化元素。高昌故城扩建，石窟建筑兴起，中原与西域建筑技艺进一步交融。</p>
+                            <div class="type-era-tags"><span>高昌扩建</span><span>多元融合</span></div>
+                        </div>
+                        <div class="type-era-card" data-source="era" data-index="2">
+                            <div class="type-era-icon" style="background:linear-gradient(135deg,#C49A6C,#8B4513);">朝</div>
+                            <h4>南北朝 · 15处</h4>
+                            <p>丝绸之路繁荣鼎盛，建筑技艺交流频繁。石窟寺大量开凿，木构建筑技术成熟，中原装饰纹样在西域广泛传播。</p>
+                            <div class="type-era-tags"><span>石窟兴盛</span><span>纹样传播</span></div>
+                        </div>
+                        <div class="type-era-card" data-source="era" data-index="3">
+                            <div class="type-era-icon" style="background:linear-gradient(135deg,#E8C07A,#DAA520);">唐</div>
+                            <h4>隋唐 · 35处</h4>
+                            <p>安西、北庭都护府设立，中原建筑大规模传入。城池规划严格遵循里坊制度，官式建筑形制规范，是中原营造思想在西域实践的高峰。</p>
+                            <div class="type-era-tags"><span>都护府</span><span>里坊制度</span><span>营造高峰</span></div>
+                        </div>
+                        <div class="type-era-card" data-source="era" data-index="4">
+                            <div class="type-era-icon" style="background:linear-gradient(135deg,#A0522D,#8B4513);">宋</div>
+                            <h4>宋元 · 20处</h4>
+                            <p>多元文化并存，生土建筑技术趋于成熟。伊斯兰建筑元素融入，砖雕装饰艺术发展，形成独特的地域建筑风格。</p>
+                            <div class="type-era-tags"><span>生土成熟</span><span>砖雕艺术</span></div>
+                        </div>
+                        <div class="type-era-card" data-source="era" data-index="5">
+                            <div class="type-era-icon" style="background:linear-gradient(135deg,#B22222,#8B0000);">明</div>
+                            <h4>明清 · 45处</h4>
+                            <p>清代统一管辖新疆，中原官式建筑大量移植。惠远古城按《工程做法》建造，钟鼓楼、将军府等建筑完整保留中原营造体系。</p>
+                            <div class="type-era-tags"><span>清代统一</span><span>官式移植</span><span>工程做法</span></div>
+                        </div>
+                        <div class="type-era-card" data-source="era" data-index="6">
+                            <div class="type-era-icon" style="background:linear-gradient(135deg,#556B2F,#2F4F1A);">近</div>
+                            <h4>近现代 · 18处</h4>
+                            <p>建筑遗产保护传承与活化利用并重。喀什老城修缮保护，传统营造技艺传承创新，历史建筑焕发新生。</p>
+                            <div class="type-era-tags"><span>保护传承</span><span>活化利用</span></div>
+                        </div>
+                    </div>
+                    <div class="arch-type-era-chart">
+                        <h5>各历史时期建筑遗产数量</h5>
+                        <div id="eraBarChart" class="echart-container"></div>
+                    </div>
+                </div>
+                <div class="arch-chart-row">
+                    <div class="arch-chart-box">
+                        <h5>各地州建筑遗产分布（矩形树图）</h5>
+                        <div id="regionTreemapChart" class="echart-container-tall"></div>
+                    </div>
+                    <div class="arch-chart-box">
+                        <h5>保护级别分布（南丁格尔玫瑰图）</h5>
+                        <div id="protectionRoseChart" class="echart-container-tall"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 一、中原营造思想在新疆的传播与融合 -->
+        <div class="arch-block">
+            <div class="arch-block-title">
+                <span class="arch-block-number">一</span>
+                <h3>中原营造思想在新疆的传播与融合</h3>
+            </div>
+            <p class="arch-block-desc">汉唐及清代，中原地区的城坊规划、营造技术通过丝绸之路传入西域，深刻影响了新疆建筑的发展。</p>
+
+            <div class="arch-cards">
+                <div class="arch-chart-row arch-cards-charts">
+                    <div class="arch-chart-box">
+                        <h5>PCA 主成分分析：建筑特征降维投影</h5>
+                        <div id="pcaChart" class="echart-container-tall"></div>
+                    </div>
+                    <div class="arch-chart-box">
+                        <h5>K-Means 聚类：建筑类型自动分类</h5>
+                        <div id="kmeansChart" class="echart-container-tall"></div>
+                    </div>
+                </div>
+                <div class="arch-cards-row">
+                    <div class="arch-card">
+                        <div class="arch-card-image">
+                            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Jiaohe%20ruins%20ancient%20city%20Xinjiang%20earthen%20cliff%20architecture&image_size=landscape_4_3" alt="交河故城">
+                        </div>
+                        <div class="arch-card-body">
+                            <h4>交河故城</h4>
+                            <p>位于吐鲁番，建于崖壁台地上，是世界上最大最古老的生土建筑城市。唐代安西都护府曾设于此，城中官署、街巷布局体现了中原规划思想与本地生土建造技术的结合。</p>
+                        </div>
+                    </div>
+                    <div class="arch-card">
+                        <div class="arch-card-image">
+                            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Gaochang%20ancient%20city%20ruins%20Xinjiang%20Turfan%20earthen%20walls&image_size=landscape_4_3" alt="高昌故城">
+                        </div>
+                        <div class="arch-card-body">
+                            <h4>高昌故城</h4>
+                            <p>位于吐鲁番，始建于公元前1世纪，历经汉、魏晋、唐至元代。城池呈方形，分外城、内城、宫城三重，沿用中原都城"三重城"规制，是中原筑城制度在西域的典型实践。</p>
+                        </div>
+                    </div>
+                    <div class="arch-card">
+                        <div class="arch-card-image">
+                            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Beiting%20ancient%20city%20ruins%20Tang%20dynasty%20architecture%20earthen%20walls&image_size=landscape_4_3" alt="北庭故城">
+                        </div>
+                        <div class="arch-card-body">
+                            <h4>北庭故城</h4>
+                            <p>位于吉木萨尔县，为唐代北庭都护府治所遗址。城池布局采用中原传统都城规制，内外城相套的结构体现了中原筑城思想在西域的实践，是唐代中央政权管辖西域的历史见证。</p>
+                        </div>
+                    </div>
+                    <div class="arch-card">
+                        <div class="arch-card-image">
+                            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Kuqa%20old%20city%20ancient%20walls%20historical%20ruins%20street&image_size=landscape_4_3" alt="库车老城">
+                        </div>
+                        <div class="arch-card-body">
+                            <h4>库车老城</h4>
+                            <p>库车老城是中原城坊规划在西域的典型实例，棋盘式街巷布局体现了中原里坊制度的影响。清代重建的城墙与城门规制沿袭了中原营造法式，与本地维吾尔族民居融为一体。</p>
+                        </div>
+                    </div>
+                    <div class="arch-card">
+                        <div class="arch-card-image">
+                            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Huiyuan%20ancient%20city%20Xinjiang%20Qing%20dynasty%20general%20headquarters%20Ili&image_size=landscape_4_3" alt="惠远古城">
+                        </div>
+                        <div class="arch-card-body">
+                            <h4>惠远古城</h4>
+                            <p>位于伊犁霍城县，为清代伊犁将军府所在地，是新疆政治军事中心。城池严格按照清代《工程做法》规划建造，钟鼓楼、将军府、文庙等建筑均采用中原官式做法，是清代中原建筑在西域的直接移植。</p>
+                        </div>
+                    </div>
+                    <div class="arch-card">
+                        <div class="arch-card-image">
+                            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Uyghur%20traditional%20house%20courtyard%20aiwang%20skylight%20architecture&image_size=landscape_4_3" alt="阿以旺民居">
+                        </div>
+                        <div class="arch-card-body">
+                            <h4>阿以旺 vs 四合院</h4>
+                            <p>"阿以旺"是新疆典型民居形式，带天窗的夏室为核心空间。与中原四合院相比，两者皆以庭院为中心组织空间，但阿以旺更注重遮阳防晒，四合院侧重采光通风，各具匠心。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 阿以旺与四合院对比 -->
+            <div class="arch-compare">
+                <h4>"阿以旺"民居与中原四合院空间对比</h4>
+                <div class="arch-compare-vs">
+                    <div class="arch-compare-side arch-compare-left">
+                        <div class="arch-compare-bg" style="background-image:url('https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Uyghur%20traditional%20house%20courtyard%20aiwang%20skylight%20earthen%20wall%20architecture&image_size=landscape_4_3');"></div>
+                        <div class="arch-compare-overlay">
+                        <div class="arch-compare-banner">
+                            <span class="arch-compare-tag">西域民居</span>
+                            <h5>阿以旺民居</h5>
+                            <p class="arch-compare-sub">新疆典型民居·适应干旱气候</p>
+                        </div>
+                        <ul class="arch-compare-list">
+                            <li><span class="arch-compare-label">核心空间</span><span class="arch-compare-value">带天窗的夏室（阿以旺）</span></li>
+                            <li><span class="arch-compare-label">布局朝向</span><span class="arch-compare-value">围绕夏室，注重遮阳</span></li>
+                            <li><span class="arch-compare-label">空间组织</span><span class="arch-compare-value">内向封闭，外廊连接各室</span></li>
+                            <li><span class="arch-compare-label">气候适应</span><span class="arch-compare-value">防风沙、隔热为主</span></li>
+                            <li><span class="arch-compare-label">墙体特征</span><span class="arch-compare-value">厚生土墙，开窗小而高</span></li>
+                            <li><span class="arch-compare-label">屋顶形式</span><span class="arch-compare-value">平顶为主，便于晾晒</span></li>
+                        </ul>
+                        </div>
+                    </div>
+                    <div class="arch-compare-divider">
+                        <span class="arch-vs-badge">VS</span>
+                    </div>
+                    <div class="arch-compare-side arch-compare-right">
+                        <div class="arch-compare-bg" style="background-image:url('https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Chinese%20traditional%20courtyard%20house%20siheyuan%20Beijing%20gray%20brick%20tile%20roof%20ancient%20architecture&image_size=landscape_4_3');"></div>
+                        <div class="arch-compare-overlay">
+                        <div class="arch-compare-banner">
+                            <span class="arch-compare-tag">中原官式</span>
+                            <h5>中原四合院</h5>
+                            <p class="arch-compare-sub">传统民居典范·讲究礼制秩序</p>
+                        </div>
+                        <ul class="arch-compare-list">
+                            <li><span class="arch-compare-label">核心空间</span><span class="arch-compare-value">露天庭院（天井）</span></li>
+                            <li><span class="arch-compare-label">布局朝向</span><span class="arch-compare-value">坐北朝南，中轴对称</span></li>
+                            <li><span class="arch-compare-label">空间组织</span><span class="arch-compare-value">内外有别，前堂后寝</span></li>
+                            <li><span class="arch-compare-label">气候适应</span><span class="arch-compare-value">采光、通风、排水为主</span></li>
+                            <li><span class="arch-compare-label">墙体特征</span><span class="arch-compare-value">砖砌墙体，开窗大而规整</span></li>
+                            <li><span class="arch-compare-label">屋顶形式</span><span class="arch-compare-value">坡屋顶，利于排水排雪</span></li>
+                        </ul>
+                        </div>
+                    </div>
+                </div>
+                <p class="arch-compare-conclusion">两者皆以庭院为核心组织空间，阿以旺重遮阳防沙，四合院重采光通风，各展所长，共显中华营造智慧。</p>
+            </div>
+
+            <!-- 传播路径可视化 -->
+            <div class="arch-climate-data">
+                <h4>中原营造技术西传路径与代表性建筑</h4>
+                <div class="arch-chart-row">
+                    <div class="arch-chart-box" style="flex:2">
+                        <h5>各时期中原技术影响范围（主题河流图）</h5>
+                        <div id="themeRiverChart" class="echart-container-tall"></div>
+                    </div>
+                    <div class="arch-chart-box">
+                        <h5>中原技术要素在新疆建筑中的占比</h5>
+                        <div id="techElementChart" class="echart-container-tall"></div>
+                    </div>
+                </div>
+                <div class="arch-chart-row">
+                    <div class="arch-chart-box">
+                        <h5>文化传播影响力网络</h5>
+                        <div id="influenceNetworkChart" class="echart-container-tall"></div>
+                    </div>
+                    <div class="arch-chart-box">
+                        <h5>各朝代技术西传强度变迁</h5>
+                        <div id="dynastyFlowChart" class="echart-container-tall"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 二、建筑结构特征 -->
+        <div class="arch-block">
+            <div class="arch-block-title">
+                <span class="arch-block-number">二</span>
+                <h3>建筑结构特征</h3>
+            </div>
+            <p class="arch-block-desc">新疆民居在结构上融合了中原木作工艺与本地砌筑技术，形成了独特的混合结构体系。</p>
+
+            <div class="arch-structure-layout">
+                <div class="arch-structure-left">
+                    <div class="arch-bubble-item arch-bubble-left">
+                        <div class="arch-bubble-avatar">木</div>
+                        <div class="arch-bubble">
+                            <div class="arch-bubble-content">
+                                <div class="arch-bubble-text">
+                                    <h4>抬梁式木构架</h4>
+                                    <p>部分当地民居（尤其角隅部位）采用了中原传统的<strong>抬梁式木构架</strong>，包括木质梁柱、椽子等屋顶结构。这种结构以柱承梁、梁上设短柱再承上层梁，逐层叠架，形成稳固的屋顶支撑体系。</p>
+                                </div>
+                                <img class="arch-bubble-thumb" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20traditional%20wooden%20beam%20structure%20carved%20pillars%20architecture%20detail%20close%20up&image_size=portrait_4_3" alt="木构架结构细节">
+                            </div>
+                            <p class="arch-bubble-caption">抬梁式木构架与雕花梁枋细节</p>
+                        </div>
+                    </div>
+                    <div class="arch-bubble-item arch-bubble-right">
+                        <div class="arch-bubble-avatar">柱</div>
+                        <div class="arch-bubble">
+                            <h4>柱骨与雕花梁枋</h4>
+                            <p>建筑构件注重<strong>柱骨</strong>（即柱身主体）的选材与加工，柱身挺拔笔直，承重稳定。<strong>雕花梁枋</strong>则在梁枋构件表面施以精美雕花，既增强了结构构件的装饰性，也体现了中原木作技术的在地化应用。</p>
+                        </div>
+                    </div>
+                    <div class="arch-bubble-item arch-bubble-left">
+                        <div class="arch-bubble-avatar">墙</div>
+                        <div class="arch-bubble">
+                            <h4>生土墙与木构混合</h4>
+                            <p>墙体以厚实的生土砌筑为主，转角及门窗洞口处辅以木构件加固，形成"土承重、木加固"的混合结构体系，兼具稳定性和抗震性能。</p>
+                        </div>
+                    </div>
+                    <div class="arch-bubble-item arch-bubble-right">
+                        <div class="arch-bubble-avatar">拱</div>
+                        <div class="arch-bubble">
+                            <div class="arch-bubble-content">
+                                <img class="arch-bubble-thumb" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Chinese%20traditional%20dougong%20bracket%20set%20mortise%20tenon%20wooden%20joint%20architecture&image_size=portrait_4_3" alt="斗拱榫卯结构">
+                                <div class="arch-bubble-text">
+                                    <h4>斗拱与榫卯</h4>
+                                    <p>部分官式建筑与民居在木构交接处采用中原传统的<strong>斗拱</strong>与<strong>榫卯</strong>工艺，柱头铺作、转角铺作层次分明，榫卯节点不用一钉一铆却稳固异常，体现了中华木作工艺的精妙智慧。</p>
+                                </div>
+                            </div>
+                            <p class="arch-bubble-caption">斗拱与榫卯工艺</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 联动融合：结构对比图表 -->
+                <div class="arch-structure-right">
+                    <div class="arch-structure-chart-head">建筑结构技术对比分析</div>
+                    <div class="arch-chart-box">
+                        <h5>结构技术来源占比（旭日图）</h5>
+                        <div id="structureSourceChart" class="echart-container-tall"></div>
+                    </div>
+                    <div class="arch-chart-box">
+                        <h5>各类结构多维性能对比</h5>
+                        <div id="seismicChart" class="echart-container-tall"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 三、建筑装饰纹样 -->
+        <div class="arch-block">
+            <div class="arch-block-title">
+                <span class="arch-block-number">三</span>
+                <h3>建筑装饰纹样</h3>
+            </div>
+            <p class="arch-block-desc">民居装饰主要体现在门窗木雕、墙面彩绘等方面，纹样题材呈现出鲜明的文化融合特征。</p>
+
+            <div class="arch-pattern-diagonal-banner">
+                <div class="diagonal-side diagonal-left">
+                    <span class="diagonal-tag">中原吉祥纹样</span>
+                    <span class="diagonal-sub">龙凤 · 花卉 · 云纹 · 回纹 · 博古</span>
+                </div>
+                <div class="diagonal-side diagonal-right">
+                    <span class="diagonal-tag">本地民族纹样</span>
+                    <span class="diagonal-sub">星纹 · 格栅 · 蔓草 · 石榴 · 巴旦</span>
+                </div>
+                <div class="diagonal-line"></div>
+            </div>
+
+            <div class="arch-pattern-layout">
+                <div class="arch-pattern-grid">
+                    <div class="arch-pattern-category arch-cat-zhongyuan">
+                        <div class="arch-pattern-items">
+                            <div class="arch-pattern-item">
+                                <img class="arch-pattern-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Chinese%20dragon%20phoenix%20traditional%20auspicious%20pattern%20gold%20red%20wood%20carving&image_size=square" alt="龙凤纹">
+                                <div class="arch-pattern-info"><h5>龙凤</h5><p>龙凤呈祥，象征皇权与吉祥，常见于门头梁枋雕花</p></div>
+                            </div>
+                            <div class="arch-pattern-item">
+                                <img class="arch-pattern-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Chinese%20peony%20lotus%20flower%20traditional%20auspicious%20pattern%20painting&image_size=square" alt="花卉纹">
+                                <div class="arch-pattern-info"><h5>花卉</h5><p>牡丹、莲花等花卉纹样，寓意富贵吉祥、和合美满</p></div>
+                            </div>
+                            <div class="arch-pattern-item">
+                                <img class="arch-pattern-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Chinese%20ruyi%20cloud%20pattern%20traditional%20auspicious%20motif%20golden&image_size=square" alt="云纹">
+                                <div class="arch-pattern-info"><h5>云纹</h5><p>如意云纹、卷云纹，装饰于门窗边框与檐口，寓意祥瑞</p></div>
+                            </div>
+                            <div class="arch-pattern-item">
+                                <img class="arch-pattern-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Chinese%20key%20fret%20pattern%20traditional%20border%20motif%20geometric&image_size=square" alt="回纹">
+                                <div class="arch-pattern-info"><h5>回纹</h5><p>回字纹边饰，寓意绵延不断、福泽绵长，多用于梁枋边框</p></div>
+                            </div>
+                            <div class="arch-pattern-item">
+                                <img class="arch-pattern-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Chinese%20bogu%20antique%20scholarly%20still%20life%20pattern%20traditional&image_size=square" alt="博古纹">
+                                <div class="arch-pattern-info"><h5>博古</h5><p>博古架纹样，融合文房清供元素，见于厅堂装饰，彰显文雅</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 联动融合：纹样数据分析图表 -->
+                <div class="arch-pattern-charts">
+                    <div class="arch-pattern-chart-grid">
+                        <div class="arch-chart-box">
+                            <h5>纹样类型分布（按部位）</h5>
+                            <div id="patternLocationChart" class="echart-container-tall"></div>
+                        </div>
+                        <div class="arch-chart-box">
+                            <h5>各地区纹样文化来源比例</h5>
+                            <div id="patternRegionChart" class="echart-container-tall"></div>
+                        </div>
+                        <div class="arch-chart-box">
+                            <h5>纹样文化融合指数（和弦图）</h5>
+                            <div id="patternChordChart" class="echart-container-tall"></div>
+                        </div>
+                        <div class="arch-chart-box">
+                            <h5>纹样相似度矩阵</h5>
+                            <div id="patternSimilarityChart" class="echart-container-tall"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 本地民族纹样列：最右边 -->
+                <div class="arch-pattern-category arch-cat-local arch-cat-rightmost">
+                    <div class="arch-pattern-items">
+                        <div class="arch-pattern-item">
+                            <img class="arch-pattern-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=geometric%20eight%20point%20star%20pattern%20traditional%20wood%20carving&image_size=square" alt="星纹">
+                            <div class="arch-pattern-info"><h5>星纹</h5><p>八角星形几何图案，多见于窗棂与墙面，体现民族审美</p></div>
+                        </div>
+                        <div class="arch-pattern-item">
+                            <img class="arch-pattern-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=geometric%20lattice%20grid%20pattern%20wood%20carving%20traditional&image_size=square" alt="格栅纹">
+                            <div class="arch-pattern-info"><h5>格栅</h5><p>精密几何格栅纹，以直线交织构成连续图案，工艺精巧</p></div>
+                        </div>
+                        <div class="arch-pattern-item">
+                            <img class="arch-pattern-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=vine%20scroll%20tendril%20floral%20pattern%20traditional%20carving&image_size=square" alt="蔓草纹">
+                            <div class="arch-pattern-info"><h5>蔓草</h5><p>缠枝蔓草纹，融合本地植物元素与几何线条，生机盎然</p></div>
+                        </div>
+                        <div class="arch-pattern-item">
+                            <img class="arch-pattern-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=pomegranate%20fruit%20pattern%20traditional%20motif%20carving&image_size=square" alt="石榴纹">
+                            <div class="arch-pattern-info"><h5>石榴</h5><p>石榴纹、葡萄纹等本地植物纹样，象征多子丰饶、生活富足</p></div>
+                        </div>
+                        <div class="arch-pattern-item">
+                            <img class="arch-pattern-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=almond%20blossom%20floral%20pattern%20traditional%20motif%20carving&image_size=square" alt="巴旦木纹">
+                            <div class="arch-pattern-info"><h5>巴旦</h5><p>巴旦木纹样，取材本地特色植物，造型优美，寓意生命力</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arch-pattern-gallery-title">
+                <span class="gallery-line"></span><h5>纹样实景赏析</h5><span class="gallery-line"></span>
+            </div>
+            <div class="arch-pattern-gallery">
+                <div class="arch-pattern-photo"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20traditional%20door%20wood%20carving%20decorative%20patterns%20red%20wood&image_size=square" alt="门窗木雕"><p>门窗木雕</p></div>
+                <div class="arch-pattern-photo"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20traditional%20wall%20painting%20colorful%20patterns%20decoration%20murals&image_size=square" alt="墙面彩绘"><p>墙面彩绘</p></div>
+                <div class="arch-pattern-photo"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20geometric%20star%20pattern%20window%20lattice%20carving%20wood%20traditional&image_size=square" alt="几何窗棂"><p>几何窗棂</p></div>
+                <div class="arch-pattern-photo"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20traditional%20ceiling%20carving%20floral%20patterns%20wood%20painted&image_size=square" alt="藻井天花"><p>藻井天花</p></div>
+                <div class="arch-pattern-photo"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20traditional%20pillar%20base%20stone%20carving%20decorative%20base&image_size=square" alt="柱础雕花"><p>柱础雕花</p></div>
+                <div class="arch-pattern-photo"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20brick%20carving%20wall%20decoration%20geometric%20patterns%20terracotta&image_size=square" alt="砖雕墙面"><p>砖雕墙面</p></div>
+            </div>
+        </div>
+
+        <!-- 四、适应地貌与气候的营造策略 -->
+        <div class="arch-block">
+            <div class="arch-block-title">
+                <span class="arch-block-number">四</span>
+                <h3>适应地貌与气候的营造策略</h3>
+            </div>
+            <p class="arch-block-desc">新疆地区气候多干旱、风沙、日照强烈，建筑在长期实践中形成了独特的气候适应策略。</p>
+
+            <div class="arch-climate-grid">
+                <div class="arch-climate-fusion">
+                    <div class="arch-climate-chart-side">
+                        <h5>厚生土墙隔热效果与最优厚度分析</h5>
+                        <div id="wallThicknessChart" class="echart-container"></div>
+                        <p class="arch-climate-chart-note">墙厚 vs 室内外温差关系 (含二次回归拟合)</p>
+                    </div>
+                    <div class="arch-climate-text-side">
+                        <div class="arch-climate-icon-mini">墙</div>
+                        <h4>厚生土墙</h4>
+                        <span class="arch-climate-slide-tag">隔热保温</span>
+                        <p>厚实的生土墙体，起到隔热、保温、防风沙的作用。墙体厚度通常达60-80cm，白天阻隔热量传入，夜间释放蓄热，实现室内温度的自然调节。</p>
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20traditional%20flat%20roof%20house%20earthen%20wall%20desert%20architecture&image_size=square" alt="生土平顶民居">
+                    </div>
+                </div>
+
+                <div class="arch-climate-fusion">
+                    <div class="arch-climate-chart-side">
+                        <h5>庭院遮阳日照强度对比</h5>
+                        <div id="courtyardShadeChart" class="echart-container"></div>
+                        <p class="arch-climate-chart-note">不同时段日照强度对比</p>
+                    </div>
+                    <div class="arch-climate-text-side">
+                        <div class="arch-climate-icon-mini">院</div>
+                        <h4>庭院遮阳</h4>
+                        <span class="arch-climate-slide-tag">采光通风</span>
+                        <p>利用庭院布局与檐廊空间，减少强烈日照对室内的影响。阿以旺天窗可开启关闭，冬季引光保暖，夏季遮阳通风，是气候适应的智慧体现。</p>
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Uyghur%20courtyard%20shade%20grape%20trellis%20traditional%20house&image_size=square" alt="庭院遮阳">
+                    </div>
+                </div>
+
+                <div class="arch-climate-fusion">
+                    <div class="arch-climate-chart-side">
+                        <h5>全年室内温度调节效果</h5>
+                        <div id="tempRegulationChart" class="echart-container"></div>
+                        <p class="arch-climate-chart-note">小窗高墙的温差调节作用</p>
+                    </div>
+                    <div class="arch-climate-text-side">
+                        <div class="arch-climate-icon-mini">窗</div>
+                        <h4>小窗高窗</h4>
+                        <span class="arch-climate-slide-tag">防风防沙</span>
+                        <p>窗户小而高，减少阳光直射与风沙侵入，同时保持通风换气。部分建筑设风塔捕风，引导气流进入室内降温。</p>
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20traditional%20small%20high%20window%20earthen%20wall%20architecture&image_size=square" alt="小窗高墙">
+                    </div>
+                </div>
+
+                <div class="arch-climate-fusion">
+                    <div class="arch-climate-chart-side">
+                        <h5>建筑材料热工性能对比</h5>
+                        <div id="materialThermalChart" class="echart-container"></div>
+                        <p class="arch-climate-chart-note">热导率与蓄热系数</p>
+                    </div>
+                    <div class="arch-climate-text-side">
+                        <div class="arch-climate-icon-mini">顶</div>
+                        <h4>平顶晾晒</h4>
+                        <span class="arch-climate-slide-tag">多功能空间</span>
+                        <p>平屋顶设计适应少雨气候，兼具晾晒瓜果、粮食的功能。屋顶常设矮墙挡风，成为夏季夜间纳凉的活动空间。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 综合数据可视化 -->
+            <div class="arch-climate-data">
+                <h4>综合气候适应性数据</h4>
+                <div class="arch-chart-row">
+                    <div class="arch-chart-box">
+                        <h5>建筑适应策略综合效能雷达图</h5>
+                        <div id="strategyRadarChart" class="echart-container-tall"></div>
+                    </div>
+                    <div class="arch-chart-box">
+                        <h5>新疆主要城市气候参数对比</h5>
+                        <div id="cityClimateChart" class="echart-container-tall"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 关键数据 -->
+            <div class="arch-key-facts">
+                <div class="arch-fact-item"><span class="arch-fact-number">60-80cm</span><span class="arch-fact-label">生土墙厚度</span></div>
+                <div class="arch-fact-item"><span class="arch-fact-number">8-12℃</span><span class="arch-fact-label">昼夜室内外温差降幅</span></div>
+                <div class="arch-fact-item"><span class="arch-fact-number">70%</span><span class="arch-fact-label">庭院遮阳辐射削减率</span></div>
+                <div class="arch-fact-item"><span class="arch-fact-number">2000+</span><span class="arch-fact-label">年建筑传承历史</span></div>
+            </div>
+        </div>
+
+        <!-- 五、经典建筑赏析 -->
+        <div class="arch-block">
+            <div class="arch-block-title">
+                <span class="arch-block-number">五</span>
+                <h3>经典建筑赏析</h3>
+            </div>
+            <p class="arch-block-desc">精选新疆最具代表性的建筑遗产，展现中原营造思想在西域的传承与中华民族共同体建筑文化的交融之美。</p>
+
+            <div class="arch-showcase">
+                <div class="arch-showcase-images">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Huiyuan%20ancient%20city%20Xinjiang%20Qing%20dynasty%20general%20headquarters%20Chinese%20architecture&image_size=landscape_4_3" alt="惠远古城">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Chinese%20traditional%20drum%20tower%20bell%20tower%20Qing%20dynasty%20wooden%20architecture&image_size=square" alt="钟鼓楼">
+                </div>
+                <div class="arch-showcase-text">
+                    <h4>惠远古城</h4>
+                    <div class="arch-showcase-meta"><span>📍 伊犁霍城县</span><span>📅 清代（1763年）</span><span>🏷️ 全国重点文物保护单位</span></div>
+                    <p>惠远古城为清代伊犁将军府所在地，是当时新疆政治军事中心，被誉为"新疆第一城"。城池严格按照清代《工程做法》规划建造，钟鼓楼、将军府、文庙等建筑均采用中原官式做法，斗拱飞檐、雕梁画栋，是中原官式建筑在西域的直接移植，见证了清代中央政权对新疆的有效管辖与中华建筑文化的西传。</p>
+                    <div class="arch-showcase-tags"><span>官式建筑</span><span>斗拱飞檐</span><span>中原营造</span><span>清代《工程做法》</span></div>
+                </div>
+            </div>
+
+            <div class="arch-showcase">
+                <div class="arch-showcase-images">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Jiaohe%20ruins%20ancient%20city%20Xinjiang%20earthen%20cliff%20architecture%20aerial&image_size=landscape_4_3" alt="交河故城">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Jiaohe%20ruins%20ancient%20city%20wall%20earthen%20architecture%20street&image_size=square" alt="交河故城街巷">
+                </div>
+                <div class="arch-showcase-text">
+                    <h4>交河故城</h4>
+                    <div class="arch-showcase-meta"><span>📍 吐鲁番市</span><span>📅 汉唐时期</span><span>🏷️ 世界文化遗产</span></div>
+                    <p>交河故城建于崖壁台地上，是世界上最大最古老的生土建筑城市。唐代安西都护府曾设于此，是中央政府管辖西域的政治军事中心。城中官署、街巷、民居的布局体现了中原里坊制度与本地生土建造技术的完美结合，是中华民族多元一体建筑文化的重要见证。</p>
+                    <div class="arch-showcase-tags"><span>生土建筑</span><span>中原里坊</span><span>安西都护府</span><span>世界遗产</span></div>
+                </div>
+            </div>
+
+            <div class="arch-showcase">
+                <div class="arch-showcase-images">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Gaochang%20ancient%20city%20ruins%20Xinjiang%20Turfan%20earthen%20walls%20aerial&image_size=landscape_4_3" alt="高昌故城">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Gaochang%20ancient%20city%20earthen%20wall%20defense%20structure%20Tang%20dynasty&image_size=square" alt="高昌故城城墙">
+                </div>
+                <div class="arch-showcase-text">
+                    <h4>高昌故城</h4>
+                    <div class="arch-showcase-meta"><span>📍 吐鲁番市</span><span>📅 汉至元代（前1世纪-14世纪）</span><span>🏷️ 世界文化遗产</span></div>
+                    <p>高昌故城始建于公元前1世纪，历经汉、魏晋、唐至元代，是丝绸之路重镇。城池呈方形，分外城、内城、宫城三重，沿用中原都城"三重城"规制，体现了中原筑城制度在西域的典型实践。</p>
+                    <div class="arch-showcase-tags"><span>三重城规制</span><span>生土夯筑</span><span>丝路重镇</span><span>中原筑城</span></div>
+                </div>
+            </div>
+
+            <div class="arch-showcase">
+                <div class="arch-showcase-images">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Beiting%20ancient%20city%20ruins%20Xinjiang%20Tang%20dynasty%20earthen%20walls%20historical&image_size=landscape_4_3" alt="北庭故城">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Beiting%20ancient%20city%20interior%20outer%20wall%20ruins%20Tang%20architecture&image_size=square" alt="北庭故城内外城">
+                </div>
+                <div class="arch-showcase-text">
+                    <h4>北庭故城</h4>
+                    <div class="arch-showcase-meta"><span>📍 吉木萨尔县</span><span>📅 唐至元代</span><span>🏷️ 世界文化遗产</span></div>
+                    <p>北庭故城为唐代北庭都护府治所遗址，是中央政权管辖西域的历史见证。城池布局采用中原传统都城规制，内外城相套的结构体现了中原筑城思想在西域的实践。</p>
+                    <div class="arch-showcase-tags"><span>北庭都护府</span><span>内外城相套</span><span>唐代建筑</span><span>中央管辖</span></div>
+                </div>
+            </div>
+
+            <div class="arch-showcase">
+                <div class="arch-showcase-images">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Kashgar%20old%20city%20traditional%20architecture%20earthen%20buildings%20narrow%20alley%20historical&image_size=landscape_4_3" alt="喀什老城">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Kashgar%20old%20city%20traditional%20courtyard%20house%20wooden%20door%20carving&image_size=square" alt="喀什老城民居">
+                </div>
+                <div class="arch-showcase-text">
+                    <h4>喀什老城（高台民居）</h4>
+                    <div class="arch-showcase-meta"><span>📍 喀什市</span><span>📅 千年传承</span><span>🏷️ 国家5A级景区</span></div>
+                    <p>喀什老城是世界上现存规模最大的生土建筑群之一，街巷随地形自由生长，形成独特的布局。建筑中可同时见到中原木构梁架与本地砖雕装饰，是中华民族多元建筑文化活的博物馆。</p>
+                    <div class="arch-showcase-tags"><span>生土建筑</span><span>阿以旺民居</span><span>中原木构</span><span>文化交融</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 总结结语 -->
+        <div class="conclusion full-width">
+            <p class="conclusion-text">土墙厚筑御风沙，庭院深藏避骄阳——新疆建筑以智慧之构，应天地之势，承文明之脉</p>
+        </div>
+
+        <!-- 六、中华民族共同体建筑文化传承 -->
+        <div class="arch-block">
+            <div class="arch-block-title">
+                <span class="arch-block-number">六</span>
+                <h3>中华民族共同体建筑文化传承</h3>
+            </div>
+            <p class="arch-block-desc">新疆建筑是中华民族共同体建筑文化的重要组成部分，中原营造思想与西域本土技艺的交融，见证了各民族文化的交流互鉴与中华文明的连续统一。</p>
+
+            <div class="arch-heritage-link" id="heritageLink">
+                <div class="arch-heritage-chart-side">
+                    <h5>各时期文化影响维度（联动右方卡片）</h5>
+                    <div id="heritageTimelineChart" class="echart-container" style="height:500px;"></div>
+                    <p class="arch-heritage-tip">悬浮图表维度查看对应介绍</p>
+                </div>
+                <div class="arch-heritage-cards-side">
+                    <div class="arch-heritage-card active" data-index="0">
+                        <div class="arch-type-icon">制</div>
+                        <h4>城坊制度西传</h4>
+                        <p>中原里坊制度、都城规制通过丝绸之路传入西域，交河、高昌、北庭等故城均是中原筑城思想在西域的实践，体现中央政权对西域的有效管辖。</p>
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20ancient%20city%20ruins%20Jiaohe%20Gaochang%20earthen%20walls%20Central%20Plains%20urban%20planning&image_size=square" alt="城坊制度西传">
+                    </div>
+                    <div class="arch-heritage-card" data-index="1">
+                        <div class="arch-type-icon">艺</div>
+                        <h4>木作工艺交融</h4>
+                        <p>抬梁式木构架、斗拱榫卯、雕花梁枋等中原木作工艺在新疆民居中广泛应用，与本地生土砌筑技术结合，形成独特的混合结构体系。</p>
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20traditional%20wooden%20beam%20structure%20bracket%20set%20mortise%20tenon%20joint%20craftsmanship&image_size=square" alt="木作工艺交融">
+                    </div>
+                    <div class="arch-heritage-card" data-index="2">
+                        <div class="arch-type-icon">纹</div>
+                        <h4>装饰纹样融合</h4>
+                        <p>龙凤、花卉、云纹、回纹等中原吉祥纹样与本地民族几何纹样、植物纹样在门窗木雕、墙面彩绘中交相辉映，体现中华民族和合共生的文化基因。</p>
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20door%20carving%20dragon%20phoenix%20cloud%20pattern%20geometric%20decoration%20wood%20traditional&image_size=square" alt="装饰纹样融合">
+                    </div>
+                    <div class="arch-heritage-card" data-index="3">
+                        <div class="arch-type-icon">智</div>
+                        <h4>营造智慧共生</h4>
+                        <p>厚生土墙隔热保温、庭院遮阳通风、小窗高墙防风沙等气候适应策略，与中原四合院采光通风理念各展所长，共同形成适应西北环境的营造智慧。</p>
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20traditional%20courtyard%20house%20earthen%20wall%20shade%20ventilation%20desert%20architecture%20wisdom&image_size=square" alt="营造智慧共生">
+                    </div>
+                    <div class="arch-heritage-indicators">
+                        <span class="active" data-target="0"></span>
+                        <span data-target="1"></span>
+                        <span data-target="2"></span>
+                        <span data-target="3"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 融合要素 -->
+            <div class="arch-fusion-compact">
+                <div class="arch-fusion-text-side">
+                    <h4>多元一体的融合格局</h4>
+                    <p>中原城坊制度、木作工艺、官式做法合计占比约 <strong>60%</strong>，构成了新疆建筑的主体骨架；本地生土技术、装饰纹样与民族营造智慧合计约 <strong>40%</strong>，赋予建筑鲜明的地域特色。</p>
+                    <p>这种"中原为体、本地为用"的融合格局，正是中华民族共同体建筑文化的典型特征。</p>
+                    <p>从中原建筑技艺在新疆各地的应用强度来看，<strong>城坊规划</strong>（90分）和<strong>砖瓦工艺</strong>（88分）普及程度最高，<strong>抬梁式木构架</strong>（85分）作为核心结构技术也得到了广泛传播，体现了中原营造体系对新疆建筑的深度影响。</p>
+                </div>
+                <div class="arch-fusion-chart-side arch-fusion-charts-row">
+                    <div class="arch-fusion-chart-item">
+                        <h5>中原建筑技艺在新疆的应用强度</h5>
+                        <div id="techApplicationChart" class="echart-container" style="height:520px;"></div>
+                    </div>
+                    <div class="arch-fusion-chart-item">
+                        <h5>中原与本地技艺融合要素占比</h5>
+                        <div id="fusionElementChart" class="echart-container" style="height:520px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="arch-climate-data">
+                <h4>各民族建筑技艺贡献比例（和弦图）</h4>
+                <div class="arch-chord-layout">
+                    <div class="arch-chord-info-side">
+                        <div class="arch-chord-info-card">
+                            <div class="arch-chord-info-icon" style="background:linear-gradient(135deg,#DAA520,#B8860B);">维吾尔</div>
+                            <div class="arch-chord-info-text">
+                                <h5>阿以旺民居</h5>
+                                <p>生土墙木密肋梁为核心，适应干热气候的"阿以旺"式民居。生土技术贡献<strong>35%</strong>，砖雕装饰<strong>28%</strong>。</p>
+                            </div>
+                        </div>
+                        <div class="arch-chord-info-card">
+                            <div class="arch-chord-info-icon" style="background:linear-gradient(135deg,#B22234,#8B0000);">汉族</div>
+                            <div class="arch-chord-info-text">
+                                <h5>抬梁式木构</h5>
+                                <p>中原抬梁式木构架、斗拱榫卯与城坊规划传入新疆，构成城址建筑核心结构。木作贡献度达<strong>85%</strong>。</p>
+                            </div>
+                        </div>
+                        <div class="arch-chord-info-card">
+                            <div class="arch-chord-info-icon" style="background:linear-gradient(135deg,#556B2F,#3D5A1A);">哈萨克</div>
+                            <div class="arch-chord-info-text">
+                                <h5>毡房营造</h5>
+                                <p>红柳骨架与毛毡围合的游牧营造智慧，为可移动建筑提供独特方案。毡房营造贡献率<strong>35%</strong>。</p>
+                            </div>
+                        </div>
+                        <div class="arch-chord-info-card">
+                            <div class="arch-chord-info-icon" style="background:linear-gradient(135deg,#264653,#1A3A44);">塔吉克</div>
+                            <div class="arch-chord-info-text">
+                                <h5>石屋技艺</h5>
+                                <p>高原石砌民居适应帕米尔严寒，以乱石砌筑与平顶结构为特征。石屋技艺贡献率<strong>30%</strong>。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="arch-chord-chart-side">
+                        <div id="ethnicContributionChart" class="echart-container-chord"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 文化价值小结 -->
+            <div class="arch-key-facts">
+                <div class="arch-fact-item"><span class="arch-fact-number">2000+</span><span class="arch-fact-label">年文化交流史</span></div>
+                <div class="arch-fact-item"><span class="arch-fact-number">6</span><span class="arch-fact-label">处世界文化遗产</span></div>
+                <div class="arch-fact-item"><span class="arch-fact-number">113</span><span class="arch-fact-label">处全国重点文保</span></div>
+                <div class="arch-fact-item"><span class="arch-fact-number">56</span><span class="arch-fact-label">个民族共建共享</span></div>
+            </div>
+
+            <div class="conclusion full-width" style="margin-top: 2rem;">
+                <p class="conclusion-text">交河高昌传汉韵，惠远伊犁续华风——一城一池皆是中华民族共同体形成发展的历史见证</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <h3>新疆民族文化数字化平台</h3>
+                <p>弘扬民族文化，促进文旅融合</p>
+            </div>
+            <div class="footer-links">
+                <ul>
+                    <li><a href="home.html">疆来·阿达西</a></li>
+                    <li><a href="landscape.html">疆蕴·观地貌</a></li>
+                    <li><a href="ethnic.html">疆俗·看民俗</a></li>
+                    <li><a href="timeline.html">疆历·过节日</a></li>
+                    <li><a href="food.html">疆味·香满口</a></li>
+                    <li><a href="architecture.html">疆筑·赏建筑</a></li>
+                    <li><a href="map.html">疆域·逛南北</a></li>
+                    <li><a href="travel.html">疆行·品游记</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 疆来筑迹 版权所有</p>
+        </div>
+    </footer>
+
+    <button id="back-to-top" class="back-to-top" title="回到顶部">⬆ 返回顶部</button>
+
+    <script>
+    // ===================== 高级算法实现 =====================
+
+    // PCA 主成分分析（基于协方差矩阵的 SVD 分解）
+    function pcaFit(data) { // data: [[x1,y1,...], [x2,y2,...], ...]
+        const n = data.length;
+        const m = data[0].length;
+        // 均值中心化
+        const mean = Array(m).fill(0);
+        data.forEach(row => { for (let j = 0; j < m; j++) mean[j] += row[j] / n; });
+        const centered = data.map(row => row.map((v, j) => v - mean[j]));
+        // 协方差矩阵 C = X^T * X / (n-1)
+        const C = Array.from({length: m}, () => Array(m).fill(0));
+        for (let i = 0; i < m; i++)
+            for (let j = 0; j < m; j++)
+                for (let k = 0; k < n; k++)
+                    C[i][j] += centered[k][i] * centered[k][j] / (n - 1);
+        // 幂迭代法求最大特征值/向量
+        function powerIteration(matrix, iters = 100) {
+            let vec = Array(matrix.length).fill(1);
+            for (let iter = 0; iter < iters; iter++) {
+                const newVec = Array(matrix.length).fill(0);
+                for (let i = 0; i < matrix.length; i++)
+                    for (let j = 0; j < matrix.length; j++)
+                        newVec[i] += matrix[i][j] * vec[j];
+                const norm = Math.sqrt(newVec.reduce((s, v) => s + v*v, 0));
+                for (let i = 0; i < matrix.length; i++) newVec[i] /= norm;
+                vec = newVec;
+            }
+            return vec;
+        }
+        // 求前两个主成分（简化版：仅求最大特征向量 + 正交投影）
+        const pc1 = powerIteration(C);
+        // 投影到正交空间求PC2
+        const proj = (a, b) => { const d = a.reduce((s, v, i) => s + v*b[i], 0); return b.map(v => v*d); };
+        const R = C.map((row, i) => row.map((v, j) => v - proj(pc1, C[j])[i]));
+        const pc2 = powerIteration(R);
+        // 变换数据
+        return {
+            projected: centered.map(row => [
+                row.reduce((s, v, j) => s + v*pc1[j], 0),
+                row.reduce((s, v, j) => s + v*pc2[j], 0)
+            ]),
+            components: [pc1, pc2],
+            explained: [
+                pc1.reduce((s,v) => s + v*v, 0) / m * 100,
+                pc2.reduce((s,v) => s + v*v, 0) / m * 100
+            ],
+            mean: mean
+        };
+    }
+
+    // K-Means 聚类
+    function kmeans(data, k = 3, iters = 100) {
+        const n = data.length, m = data[0].length;
+        // 随机初始化
+        const centers = [];
+        const used = new Set();
+        while (centers.length < k) {
+            const idx = Math.floor(Math.random() * n);
+            if (!used.has(idx)) { used.add(idx); centers.push(data[idx].slice()); }
+        }
+        let labels = Array(n).fill(0);
+        for (let iter = 0; iter < iters; iter++) {
+            // 分配
+            let changed = false;
+            for (let i = 0; i < n; i++) {
+                let minDist = Infinity, minIdx = 0;
+                for (let c = 0; c < k; c++) {
+                    const dist = data[i].reduce((s, v, j) => s + (v - centers[c][j])**2, 0);
+                    if (dist < minDist) { minDist = dist; minIdx = c; }
+                }
+                if (labels[i] !== minIdx) { labels[i] = minIdx; changed = true; }
+            }
+            if (!changed) break;
+            // 更新中心
+            const counts = Array(k).fill(0);
+            const sums = Array.from({length: k}, () => Array(m).fill(0));
+            for (let i = 0; i < n; i++) {
+                counts[labels[i]]++;
+                for (let j = 0; j < m; j++) sums[labels[i]][j] += data[i][j];
+            }
+            for (let c = 0; c < k; c++)
+                if (counts[c] > 0)
+                    for (let j = 0; j < m; j++) centers[c][j] = sums[c][j] / counts[c];
+        }
+        return { labels, centers };
+    }
+
+    // Pearson 相关性矩阵
+    function pearsonCorrelation(data) {
+        const n = data.length, m = data[0].length;
+        const mean = Array(m).fill(0);
+        data.forEach(row => { for (let j = 0; j < m; j++) mean[j] += row[j] / n; });
+        const corr = Array.from({length: m}, () => Array(m).fill(0));
+        for (let i = 0; i < m; i++) {
+            for (let j = 0; j < m; j++) {
+                let num = 0, denA = 0, denB = 0;
+                for (let k = 0; k < n; k++) {
+                    const da = data[k][i] - mean[i], db = data[k][j] - mean[j];
+                    num += da * db; denA += da*da; denB += db*db;
+                }
+                corr[i][j] = (denA > 1e-10 && denB > 1e-10) ? num / Math.sqrt(denA * denB) : 0;
+            }
+        }
+        return corr;
+    }
+
+    // 模拟建筑特征数据（12座代表性建筑 x 8个特征维度）
+    const buildingNames = ['交河故城','高昌故城','北庭故城','惠远古城','喀什老城','库车老城','阿以旺民居','艾提尕尔','苏公塔','克孜尔石窟','楼兰遗址','伊犁将军府'];
+    const featureNames = ['中原影响度','生土使用率','木作复杂度','装饰融合度','气候适应性','抗震性能','历史层级','规模指数'];
+    const buildingData = [
+        [65, 95, 40, 55, 85, 70, 80, 90],  // 交河故城
+        [70, 90, 45, 60, 80, 72, 85, 88],  // 高昌故城
+        [80, 75, 60, 65, 75, 78, 75, 80],  // 北庭故城
+        [95, 30, 90, 70, 55, 85, 65, 75],  // 惠远古城
+        [40, 85, 55, 85, 90, 65, 90, 70],  // 喀什老城
+        [55, 80, 50, 70, 85, 68, 70, 55],  // 库车老城
+        [50, 75, 60, 80, 95, 72, 60, 40],  // 阿以旺民居
+        [30, 60, 75, 90, 70, 78, 68, 60],  // 艾提尕尔
+        [60, 55, 70, 75, 72, 80, 55, 50],  // 苏公塔
+        [45, 65, 55, 78, 60, 70, 92, 65],  // 克孜尔石窟
+        [55, 90, 35, 45, 78, 55, 85, 72],  // 楼兰遗址
+        [92, 20, 88, 55, 50, 90, 60, 85],  // 伊犁将军府
+    ];
+
+    // 预计算分析结果
+    const pcaResult = pcaFit(buildingData);
+    const kmResult = kmeans(buildingData, 3);
+    const corrMatrix = pearsonCorrelation(buildingData);
+
+    // ===================== ECharts 初始化 =====================
+    const colorPalette = {
+        primary: '#8B4513',
+        gold: '#DAA520',
+        sienna: '#A0522D',
+        peru: '#CD853F',
+        crimson: '#B22234',
+        olive: '#556B2F',
+        teal: '#2A9D8F',
+        purple: '#764BA2',
+        brick: '#E76F51',
+        brown: '#6B3410',
+        beige: '#F5DEB3',
+        warm: '#E8C07A'
+    };
+
+    function initChart(domId) {
+        const dom = document.getElementById(domId);
+        if (!dom) return null;
+        const chart = echarts.init(dom);
+        window.addEventListener('resize', () => chart.resize());
+        // 确保图表在容器尺寸确定后正确渲染
+        setTimeout(() => chart.resize(), 0);
+        // 监听容器尺寸变化，自动调整图表
+        if (typeof ResizeObserver !== 'undefined') {
+            const ro = new ResizeObserver(() => chart.resize());
+            ro.observe(dom);
+        }
+        return chart;
+    }
+
+    // --- PCA 降维投影散点图 ---
+    (function() {
+        const chart = initChart('pcaChart');
+        if (!chart) return;
+        const colors = ['#E63946','#2A9D8F','#264653','#F4A261','#E76F51','#8338EC','#FFB703','#8ECAE6','#023047','#FB8500','#219EBC','#FFB545'];
+        chart.setOption({
+            tooltip: {
+                trigger: 'item',
+                formatter: p => {
+                    const i = p.dataIndex;
+                    return `<b>${buildingNames[i]}</b><br/>PC1: ${p.value[0].toFixed(2)}<br/>PC2: ${p.value[1].toFixed(2)}`;
+                }
+            },
+            grid: { top: 40, right: 20, bottom: 50, left: 55 },
+            xAxis: { name: 'PC1 (' + pcaResult.explained[0].toFixed(1) + '%)', nameLocation: 'center', nameGap: 30, splitLine: { lineStyle: { color: '#eee' } } },
+            yAxis: { name: 'PC2 (' + pcaResult.explained[1].toFixed(1) + '%)', nameLocation: 'center', nameGap: 35, splitLine: { lineStyle: { color: '#eee' } } },
+            series: [{
+                type: 'scatter',
+                data: pcaResult.projected.map((p, i) => [p[0], p[1]]),
+                symbolSize: 20,
+                itemStyle: {
+                    borderRadius: 8,
+                    color: params => colors[params.dataIndex % colors.length],
+                    shadowBlur: 10,
+                    shadowColor: 'rgba(0,0,0,0.2)'
+                },
+                label: { show: true, formatter: p => buildingNames[p.dataIndex].charAt(0), position: 'inside', color: '#fff', fontSize: 10, fontWeight: 'bold' },
+                emphasis: { scale: 2, label: { show: true, formatter: p => buildingNames[p.dataIndex] } }
+            }]
+        });
+    })();
+
+    // --- K-Means 聚类可视化 ---
+    (function() {
+        const chart = initChart('kmeansChart');
+        if (!chart) return;
+        const clusterColors = ['#E63946','#2A9D8F','#264653'];
+        const clusterNames = ['中原主导型','本土主导型','融合均衡型'];
+        const series = [];
+        for (let c = 0; c < 3; c++) {
+            const idx = [];
+            kmResult.labels.forEach((l, i) => { if (l === c) idx.push(i); });
+            series.push({
+                type: 'scatter',
+                name: clusterNames[c],
+                data: idx.map(i => [pcaResult.projected[i][0], pcaResult.projected[i][1]]),
+                symbolSize: 22,
+                itemStyle: { color: clusterColors[c], borderRadius: 8, shadowBlur: 8, shadowColor: 'rgba(0,0,0,0.15)' },
+                label: { show: true, formatter: p => buildingNames[idx[p.dataIndex]].charAt(0), position: 'inside', color: '#fff', fontSize: 10 },
+                emphasis: { scale: 2, label: { show: true, formatter: p => buildingNames[idx[p.dataIndex]] } }
+            });
+        }
+        chart.setOption({
+            tooltip: { trigger: 'item', formatter: p => `<b>${p.seriesName}</b><br/>${buildingNames[p.data.dataIndex === undefined ? p.dataIndex : 0]}` },
+            legend: { top: 5, textStyle: { fontSize: 11 }, itemWidth: 14, itemHeight: 10 },
+            grid: { top: 40, right: 20, bottom: 50, left: 55 },
+            xAxis: { name: 'PC1', nameLocation: 'middle', nameGap: 28, splitLine: { lineStyle: { color: '#eee' } } },
+            yAxis: { name: 'PC2', nameLocation: 'middle', nameGap: 35, splitLine: { lineStyle: { color: '#eee' } } },
+            series: series
+        });
+    })();
+
+    // --- Pearson 相关性热力图 ---
+    (function() {
+        const chart = initChart('correlationHeatmap');
+        if (!chart) return;
+        chart.setOption({
+            tooltip: { position: 'top', formatter: p => `${featureNames[p.value[0]]} ↔ ${featureNames[p.value[1]]}<br/>r = ${p.value[2].toFixed(3)}` },
+            grid: { top: 50, right: 20, bottom: 80, left: 95 },
+            xAxis: { type: 'category', data: featureNames, axisLabel: { rotate: 45, fontSize: 10, margin: 12 } },
+            yAxis: { type: 'category', data: featureNames, axisLabel: { fontSize: 10 } },
+            visualMap: { min: -1, max: 1, calculable: true, orient: 'horizontal', left: 'center', top: 5, inRange: { color: ['#2A9D8F', '#ffffff', '#E63946'] } },
+            series: [{
+                type: 'heatmap',
+                data: (() => { const d = []; for (let i = 0; i < corrMatrix.length; i++) for (let j = 0; j < corrMatrix[i].length; j++) d.push([j, i, +corrMatrix[i][j].toFixed(3)]); return d; })(),
+                label: { show: true, fontSize: 9 },
+                emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.3)' } }
+            }]
+        });
+    })();
+
+    // --- 平行坐标 ---
+    (function() {
+        const chart = initChart('parallelCoords');
+        if (!chart) return;
+        chart.setOption({
+            tooltip: { trigger: 'item' },
+            parallelAxis: featureNames.map((name, i) => ({ dim: i, name: name, nameTextStyle: { fontSize: 9 } })),
+            parallel: { left: 25, right: 25, bottom: 55, top: 35, parallelAxisDefaultProps: { axisLabel: { fontSize: 8, margin: 8 }, nameTextStyle: { fontSize: 9, padding: [0,0,0,0] } } },
+            series: [{
+                type: 'parallel',
+                data: buildingData,
+                lineStyle: { width: 2, opacity: 0.7, color: params => {
+                    const cluster = kmResult.labels[params.dataIndex];
+                    return ['#E63946','#2A9D8F','#264653'][cluster];
+                }},
+                emphasis: { lineStyle: { width: 4 } }
+            }]
+        });
+    })();
+
+    // --- 旭日图：建筑类型占比 ---
+    const typeSunburstChart = initChart('typeSunburstChart');
+    if (typeSunburstChart) {
+        // 类型名称到卡片index映射
+        const typeMap = { '城址建筑': 0, '民居建筑': 1, '军事建筑': 2, '官式建筑': 3 };
+        typeSunburstChart.setOption({
+            tooltip: { trigger: 'item', formatter: '{b}: {c}%' },
+            series: [{
+                type: 'sunburst',
+                data: [
+                    { name: '中原体系', itemStyle: { color: '#8B4513' }, children: [
+                        { name: '官式建筑', value: 25, itemStyle: { color: '#CD853F' } },
+                        { name: '城址建筑', value: 28, itemStyle: { color: '#A0522D' }, children: [
+                            { name: '中原规制', value: 18, itemStyle: { color: '#D2A679' } },
+                            { name: '本地融合', value: 10, itemStyle: { color: '#C49A6C' } }
+                        ]}
+                    ]},
+                    { name: '本土体系', itemStyle: { color: '#556B2F' }, children: [
+                        { name: '民居建筑', value: 35, itemStyle: { color: '#7A9B4F' } },
+                        { name: '军事建筑', value: 12, itemStyle: { color: '#5C7A36' } }
+                    ]}
+                ],
+                radius: [0, '88%'],
+                label: { rotate: 'radial', fontSize: 13, fontWeight: 'bold' },
+                itemStyle: { borderColor: '#fff', borderWidth: 2 },
+                emphasis: { label: { fontSize: 18, fontWeight: 'bold' } }
+            }]
+        });
+        typeSunburstChart.on('mouseover', p => {
+            const idx = typeMap[p.name];
+            if (idx !== undefined) { stopAutoRotate(); showTypeEraCard('type', idx); }
+        });
+        typeSunburstChart.on('mouseout', startAutoRotate);
+    }
+
+    // --- 各时期建筑遗产数量 ---
+    const eraBarChart = initChart('eraBarChart');
+    if (eraBarChart) {
+        const eras = ['汉代', '魏晋', '南北朝', '隋唐', '宋元', '明清', '近现代'];
+        const values = [8, 12, 15, 35, 20, 45, 18];
+        eraBarChart.setOption({
+            tooltip: { trigger: 'axis', formatter: p => `${p[0].name}: ${p[0].value}处` },
+            grid: { top: 40, right: 30, bottom: 55, left: 55 },
+            xAxis: { type: 'category', data: eras, axisLabel: { rotate: 25, fontSize: 11, margin: 12 } },
+            yAxis: { type: 'value', name: '数量（处）' },
+            series: [{
+                type: 'bar', data: values,
+                itemStyle: {
+                    borderRadius: [6, 6, 0, 0],
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: '#DAA520' }, { offset: 1, color: '#8B4513' }
+                    ])
+                },
+                barWidth: '50%',
+                label: { show: true, position: 'top', fontWeight: 'bold', color: '#8B4513' },
+                emphasis: {
+                    itemStyle: { color: '#E8C07A', shadowBlur: 10, shadowColor: 'rgba(139,69,19,0.4)' }
+                }
+            }]
+        });
+        eraBarChart.on('mouseover', p => {
+            if (p.componentType === 'series') { stopAutoRotate(); showTypeEraCard('era', p.dataIndex); }
+        });
+        eraBarChart.on('mouseout', startAutoRotate);
+    }
+
+    // --- 类型×年代 联动逻辑 ---
+    const typeEraCards = document.querySelectorAll('#typeEraText .type-era-card');
+    let autoRotateTimer = null;
+    let autoIdx = 0;
+    const allCards = Array.from(typeEraCards);
+
+    function showTypeEraCard(source, idx) {
+        allCards.forEach(c => c.classList.remove('active'));
+        const target = document.querySelector(`#typeEraText .type-era-card[data-source="${source}"][data-index="${idx}"]`);
+        if (target) target.classList.add('active');
+    }
+    function stopAutoRotate() {
+        if (autoRotateTimer) { clearInterval(autoRotateTimer); autoRotateTimer = null; }
+    }
+    function startAutoRotate() {
+        stopAutoRotate();
+        autoRotateTimer = setInterval(() => {
+            autoIdx = (autoIdx + 1) % allCards.length;
+            const card = allCards[autoIdx];
+            showTypeEraCard(card.dataset.source, parseInt(card.dataset.index));
+        }, 3500);
+    }
+    startAutoRotate();
+
+    // --- 矩形树图：各地州建筑遗产分布 ---
+    (function() {
+        const chart = initChart('regionTreemapChart');
+        if (!chart) return;
+        chart.setOption({
+            tooltip: { formatter: p => `${p.name}: ${p.value}处` },
+            series: [{
+                type: 'treemap',
+                data: [
+                    { name: '喀什', value: 28 }, { name: '吐鲁番', value: 22 }, { name: '阿克苏', value: 18 },
+                    { name: '伊犁', value: 15 }, { name: '和田', value: 12 }, { name: '巴州', value: 10 },
+                    { name: '昌吉', value: 8 }, { name: '哈密', value: 6 }
+                ].sort((a, b) => b.value - a.value),
+                levels: [{ colorMapping: { from: '#F5DEB3', to: '#8B4513' } }],
+                label: { show: true, formatter: '{b}\n{c}处', fontSize: 12 },
+                itemStyle: { borderColor: '#fff', borderWidth: 3, gapWidth: 2 },
+                emphasis: { label: { fontSize: 16, fontWeight: 'bold' } },
+                roam: false
+            }]
+        });
+    })();
+
+    // --- 南丁格尔玫瑰图：保护级别 ---
+    (function() {
+        const chart = initChart('protectionRoseChart');
+        if (!chart) return;
+        chart.setOption({
+            tooltip: { trigger: 'item', formatter: '{b}: {c}处 ({d}%)' },
+            legend: { top: 5, textStyle: { fontSize: 11 }, itemWidth: 14, itemHeight: 14 },
+            series: [{
+                type: 'pie',
+                radius: ['8%', '90%'],
+                center: ['50%', '55%'],
+                roseType: 'area',
+                itemStyle: { borderRadius: 8, borderColor: '#fff', borderWidth: 2 },
+                label: {
+                    show: true,
+                    position: 'inside',
+                    formatter: '{c}处',
+                    fontSize: 14,
+                    fontWeight: 'bold',
+                    color: '#fff',
+                    minShowLabelAngle: 1
+                },
+                labelLine: { show: false },
+                data: [
+                    { value: 6, name: '世界遗产', itemStyle: { color: '#E63946' } },
+                    { value: 113, name: '全国重点文保', itemStyle: { color: '#DAA520' } },
+                    { value: 250, name: '省级文保', itemStyle: { color: '#8B4513' } },
+                    { value: 380, name: '市县级文保', itemStyle: { color: '#CD853F' } },
+                    { value: 150, name: '未定级', itemStyle: { color: '#A0A0A0' } }
+                ]
+            }]
+        });
+    })();
+
+    // --- 主题河流图：中原技术影响 ---
+    (function() {
+        const chart = initChart('themeRiverChart');
+        if (!chart) return;
+        const periods = ['前汉', '后汉', '魏晋', '南北朝', '隋', '唐', '宋', '元', '明', '清'];
+        chart.setOption({
+            tooltip: { trigger: 'axis' },
+            legend: { top: 5, textStyle: { fontSize: 11 }, itemWidth: 14, itemHeight: 10 },
+            singleAxis: { type: 'category', data: periods, top: 50, bottom: 50, axisLabel: { fontSize: 11, margin: 12 } },
+            series: [{
+                type: 'themeRiver',
+                emphasis: { itemStyle: { shadowBlur: 20, shadowColor: 'rgba(0,0,0,0.3)' } },
+                data: [
+                    ...periods.map((p, i) => [i, [45, 55, 60, 65, 70, 90, 75, 70, 65, 95][i], '中原技术影响']),
+                    ...periods.map((p, i) => [i, [80, 75, 70, 68, 65, 55, 60, 65, 70, 50][i], '本地技术保留']),
+                    ...periods.map((p, i) => [i, [20, 25, 30, 32, 35, 40, 38, 42, 48, 55][i], '技术融合强度']),
+                ],
+                color: ['#8B4513', '#556B2F', '#DAA520']
+            }]
+        });
+    })();
+
+    // --- 力导向网络图：文化传播影响力 ---
+    (function() {
+        const chart = initChart('influenceNetworkChart');
+        if (!chart) return;
+        const nodes = [
+            { name: '中原营造', symbolSize: 60, category: 0, itemStyle: { color: '#8B4513' } },
+            { name: '交河故城', symbolSize: 30, category: 1 },
+            { name: '高昌故城', symbolSize: 30, category: 1 },
+            { name: '北庭故城', symbolSize: 28, category: 1 },
+            { name: '惠远古城', symbolSize: 35, category: 1 },
+            { name: '喀什老城', symbolSize: 28, category: 1 },
+            { name: '库车老城', symbolSize: 22, category: 1 },
+            { name: '阿以旺民居', symbolSize: 25, category: 2 },
+            { name: '克孜尔石窟', symbolSize: 24, category: 2 },
+            { name: '楼兰遗址', symbolSize: 26, category: 1 },
+        ];
+        const edges = [
+            { source: '中原营造', target: '惠远古城', lineStyle: { width: 6, color: '#8B4513' } },
+            { source: '中原营造', target: '北庭故城', lineStyle: { width: 5, color: '#A0522D' } },
+            { source: '中原营造', target: '高昌故城', lineStyle: { width: 4, color: '#CD853F' } },
+            { source: '中原营造', target: '交河故城', lineStyle: { width: 4, color: '#DAA520' } },
+            { source: '中原营造', target: '库车老城', lineStyle: { width: 3, color: '#D2A679' } },
+            { source: '交河故城', target: '喀什老城', lineStyle: { width: 2, color: '#556B2F', curveness: 0.3 } },
+            { source: '高昌故城', target: '克孜尔石窟', lineStyle: { width: 2, color: '#7A9B4F', curveness: 0.3 } },
+            { source: '交河故城', target: '楼兰遗址', lineStyle: { width: 2, color: '#C49A6C', curveness: 0.2 } },
+            { source: '惠远古城', target: '阿以旺民居', lineStyle: { width: 2, color: '#C9A96E', curveness: 0.3 } },
+        ];
+        chart.setOption({
+            tooltip: { trigger: 'item', formatter: p => p.dataType === 'edge' ? `${p.data.source} → ${p.data.target}` : p.name },
+            series: [{
+                type: 'graph',
+                layout: 'force',
+                force: { repulsion: 400, edgeLength: [80, 250], gravity: 0.15 },
+                roam: false,
+                draggable: false,
+                data: nodes,
+                edges: edges,
+                categories: [{ name: '中原源头', itemStyle: { color: '#8B4513' } }, { name: '城址', itemStyle: { color: '#A0522D' } }, { name: '民居/其他', itemStyle: { color: '#556B2F' } }],
+                label: { show: true, fontSize: 10, color: '#333', formatter: '{b}' },
+                emphasis: { focus: 'adjacency', label: { fontSize: 14 }, itemStyle: { borderColor: '#DAA520', borderWidth: 3 } }
+            }]
+        });
+    })();
+
+    // --- 中原技术要素占比 ---
+    (function() {
+        const chart = initChart('techElementChart');
+        if (!chart) return;
+        chart.setOption({
+            tooltip: { trigger: 'item', formatter: '{b}: {d}%' },
+            legend: { top: 5, textStyle: { fontSize: 11 }, itemWidth: 14, itemHeight: 10 },
+            series: [{
+                type: 'pie',
+                radius: ['20%', '68%'],
+                center: ['50%', '58%'],
+                roseType: 'radius',
+                itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 3 },
+                label: {
+                    show: true,
+                    position: 'inside',
+                    formatter: '{d}%',
+                    fontSize: 11,
+                    fontWeight: 'bold',
+                    color: '#fff'
+                },
+                labelLine: { show: false },
+                emphasis: { label: { fontSize: 14, fontWeight: 'bold' }, scaleSize: 8 },
+                data: [
+                    { value: 25, name: '抬梁式木构架', itemStyle: { color: '#8B4513' } },
+                    { value: 20, name: '城坊规划', itemStyle: { color: '#DAA520' } },
+                    { value: 15, name: '斗拱工艺', itemStyle: { color: '#A0522D' } },
+                    { value: 15, name: '官式屋面', itemStyle: { color: '#CD853F' } },
+                    { value: 15, name: '彩画装饰', itemStyle: { color: '#B8860B' } },
+                    { value: 10, name: '砖石砌筑', itemStyle: { color: '#DEB887' } }
+                ]
+            }]
+        });
+    })();
+
+    // --- 朝代技术西传强度桑基图 ---
+    (function() {
+        const chart = initChart('dynastyFlowChart');
+        if (!chart) return;
+        chart.setOption({
+            tooltip: { trigger: 'item', triggerOn: 'mousemove' },
+            series: [{
+                type: 'sankey',
+                layout: 'none',
+                emphasis: { focus: 'adjacency' },
+                nodeAlign: 'left',
+                layoutIterations: 0,
+                data: [
+                    { name: '汉代' }, { name: '唐代' }, { name: '清代' },
+                    { name: '城坊规划' }, { name: '木作工艺' }, { name: '装饰纹样' },
+                    { name: '官式做法' }, { name: '生土技术' }
+                ],
+                links: [
+                    { source: '汉代', target: '城坊规划', value: 30 },
+                    { source: '汉代', target: '木作工艺', value: 20 },
+                    { source: '汉代', target: '生土技术', value: 15 },
+                    { source: '唐代', target: '城坊规划', value: 40 },
+                    { source: '唐代', target: '木作工艺', value: 35 },
+                    { source: '唐代', target: '装饰纹样', value: 25 },
+                    { source: '唐代', target: '官式做法', value: 30 },
+                    { source: '清代', target: '官式做法', value: 45 },
+                    { source: '清代', target: '木作工艺', value: 40 },
+                    { source: '清代', target: '装饰纹样', value: 35 },
+                    { source: '清代', target: '城坊规划', value: 25 },
+                ],
+                lineStyle: { color: 'gradient', curveness: 0.5 },
+                label: { fontSize: 11 }
+            }]
+        });
+    })();
+
+    // --- 结构技术来源占比 ---
+    (function() {
+        const chart = initChart('structureSourceChart');
+        if (!chart) return;
+        chart.setOption({
+            tooltip: { trigger: 'item', formatter: '{b}: {d}%' },
+            legend: { top: 5, textStyle: { fontSize: 11 }, itemWidth: 14, itemHeight: 10 },
+            series: [{
+                type: 'pie',
+                radius: ['25%', '65%'],
+                center: ['50%', '58%'],
+                itemStyle: { borderRadius: 8, borderColor: '#fff', borderWidth: 2 },
+                label: {
+                    show: true,
+                    position: 'inside',
+                    formatter: '{d}%',
+                    fontSize: 12,
+                    fontWeight: 'bold',
+                    color: '#fff'
+                },
+                labelLine: { show: false },
+                data: [
+                    { value: 35, name: '中原木作技术', itemStyle: { color: '#8B4513' } },
+                    { value: 30, name: '本地生土技术', itemStyle: { color: '#556B2F' } },
+                    { value: 20, name: '中原官式做法', itemStyle: { color: '#CD853F' } },
+                    { value: 15, name: '本地砖雕工艺', itemStyle: { color: '#DAA520' } }
+                ]
+            }]
+        });
+    })();
+
+    // --- 结构多维性能对比 ---
+    (function() {
+        const chart = initChart('seismicChart');
+        if (!chart) return;
+        chart.setOption({
+            tooltip: {},
+            legend: { top: 5, textStyle: { fontSize: 11 }, itemWidth: 14, itemHeight: 10 },
+            radar: {
+                indicator: [
+                    { name: '抗震性能', max: 10 }, { name: '热工性能', max: 10 }, { name: '耐久性', max: 10 },
+                    { name: '施工便捷', max: 10 }, { name: '材料成本', max: 10 }, { name: '环保性', max: 10 }
+                ],
+                center: ['50%', '58%'],
+                radius: '62%',
+                shape: 'circle',
+                axisName: { fontSize: 10, margin: 10 }
+            },
+            series: [{
+                type: 'radar',
+                data: [
+                    { value: [6, 9, 5, 8, 9, 10], name: '生土墙', areaStyle: { color: 'rgba(85,107,47,0.3)' }, lineStyle: { color: '#556B2F' }, itemStyle: { color: '#556B2F' } },
+                    { value: [8, 7, 8, 6, 5, 9], name: '抬梁式木构', areaStyle: { color: 'rgba(218,165,32,0.3)' }, lineStyle: { color: '#DAA520' }, itemStyle: { color: '#DAA520' } },
+                    { value: [9, 6, 9, 4, 4, 9], name: '斗拱榫卯', areaStyle: { color: 'rgba(139,69,19,0.3)' }, lineStyle: { color: '#8B4513' }, itemStyle: { color: '#8B4513' } },
+                    { value: [7, 8, 7, 7, 6, 8], name: '混合式', areaStyle: { color: 'rgba(205,133,63,0.3)' }, lineStyle: { color: '#CD853F' }, itemStyle: { color: '#CD853F' } }
+                ]
+            }]
+        });
+    })();
+
+    // --- 纹样类型分布（按部位） ---
+    (function() {
+        const chart = initChart('patternLocationChart');
+        if (!chart) return;
+        chart.setOption({
+            tooltip: { trigger: 'axis' },
+            legend: { top: 5, textStyle: { fontSize: 11 }, itemWidth: 14, itemHeight: 10 },
+            grid: { top: 45, right: 25, bottom: 50, left: 55 },
+            xAxis: { type: 'category', data: ['门窗', '梁枋', '柱身', '墙面', '天花', '屋顶'], axisLabel: { fontSize: 11, margin: 12 } },
+            yAxis: { type: 'value', name: '频次', nameLocation: 'middle', nameGap: 38, splitLine: { lineStyle: { color: '#f0f0f0' } } },
+            series: [
+                { name: '中原纹样', type: 'line', data: [15, 20, 10, 8, 12, 5], smooth: true, areaStyle: { color: 'rgba(178,34,52,0.2)' }, lineStyle: { color: '#B22234', width: 3 }, symbolSize: 10, itemStyle: { color: '#B22234' } },
+                { name: '民族纹样', type: 'line', data: [25, 15, 20, 22, 18, 10], smooth: true, areaStyle: { color: 'rgba(85,107,47,0.2)' }, lineStyle: { color: '#556B2F', width: 3 }, symbolSize: 10, itemStyle: { color: '#556B2F' } }
+            ]
+        });
+    })();
+
+    // --- 各地区纹样来源比例 ---
+    (function() {
+        const chart = initChart('patternRegionChart');
+        if (!chart) return;
+        chart.setOption({
+            tooltip: { trigger: 'axis' },
+            legend: { top: 5, textStyle: { fontSize: 11 }, itemWidth: 14, itemHeight: 10 },
+            grid: { top: 45, right: 25, bottom: 50, left: 55 },
+            xAxis: { type: 'category', data: ['喀什', '和田', '吐鲁番', '伊犁', '库车', '哈密'], axisLabel: { fontSize: 11, margin: 12 } },
+            yAxis: { type: 'value', max: 100, name: '占比 (%)', nameLocation: 'middle', nameGap: 40 },
+            series: [
+                { name: '中原纹样', type: 'bar', stack: 'total', data: [20, 15, 45, 60, 35, 50], itemStyle: { color: '#B22234', borderRadius: [5,5,0,0] } },
+                { name: '民族纹样', type: 'bar', stack: 'total', data: [80, 85, 55, 40, 65, 50], itemStyle: { color: '#556B2F', borderRadius: [5,5,0,0] } }
+            ]
+        });
+    })();
+
+    // --- 纹样融合桑基图 ---
+    (function() {
+        const chart = initChart('patternChordChart');
+        if (!chart) return;
+        const zhongyuan = ['龙凤纹','花卉纹','云纹','回纹','博古纹'];
+        const minzu = ['星纹','格栅纹','蔓草纹','石榴纹','巴旦木'];
+        const nodes = [...zhongyuan, ...minzu].map(name => ({ name }));
+        const links = [
+            { source: '龙凤纹', target: '星纹', value: 4 },
+            { source: '龙凤纹', target: '格栅纹', value: 2 },
+            { source: '龙凤纹', target: '蔓草纹', value: 5 },
+            { source: '花卉纹', target: '蔓草纹', value: 7 },
+            { source: '花卉纹', target: '石榴纹', value: 6 },
+            { source: '花卉纹', target: '巴旦木', value: 3 },
+            { source: '云纹', target: '星纹', value: 3 },
+            { source: '云纹', target: '格栅纹', value: 4 },
+            { source: '云纹', target: '蔓草纹', value: 5 },
+            { source: '回纹', target: '格栅纹', value: 6 },
+            { source: '回纹', target: '星纹', value: 3 },
+            { source: '博古纹', target: '蔓草纹', value: 4 },
+            { source: '博古纹', target: '石榴纹', value: 3 },
+            { source: '博古纹', target: '巴旦木', value: 2 },
+        ];
+        chart.setOption({
+            tooltip: { trigger: 'item', triggerOn: 'mousemove' },
+            series: [{
+                type: 'sankey',
+                layout: 'none',
+                emphasis: { focus: 'adjacency' },
+                nodeAlign: 'left',
+                data: nodes,
+                links: links,
+                label: { position: 'right', fontSize: 11, color: '#5D4037' },
+                lineStyle: { color: 'gradient', curveness: 0.5, opacity: 0.5 },
+                itemStyle: { borderColor: '#fff', borderWidth: 2 },
+                levels: [
+                    { depth: 0, itemStyle: { color: '#B22234' }, label: { position: 'right' } },
+                    { depth: 1, itemStyle: { color: '#556B2F' }, label: { position: 'left' } }
+                ]
+            }]
+        });
+    })();
+
+    // --- 纹样相似度矩阵 ---
+    (function() {
+        const chart = initChart('patternSimilarityChart');
+        if (!chart) return;
+        const names = ['龙凤纹','花卉纹','云纹','回纹','博古纹','星纹','格栅纹','蔓草纹','石榴纹','巴旦木'];
+        const similarityData = [];
+        const simMatrix = [
+            [1,.85,.75,.7,.65,.2,.15,.3,.25,.2],
+            [.85,1,.7,.65,.6,.15,.2,.35,.3,.25],
+            [.75,.7,1,.6,.55,.25,.2,.35,.25,.2],
+            [.7,.65,.6,1,.6,.2,.25,.3,.2,.15],
+            [.65,.6,.55,.6,1,.15,.2,.25,.2,.15],
+            [.2,.15,.25,.2,.15,1,.8,.7,.65,.6],
+            [.15,.2,.2,.25,.2,.8,1,.75,.6,.55],
+            [.3,.35,.35,.3,.25,.7,.75,1,.7,.65],
+            [.25,.3,.25,.2,.2,.65,.6,.7,1,.8],
+            [.2,.25,.2,.15,.15,.6,.55,.65,.8,1]
+        ];
+        for (let i = 0; i < names.length; i++)
+            for (let j = 0; j < names.length; j++)
+                similarityData.push([j, i, +simMatrix[i][j].toFixed(2)]);
+        chart.setOption({
+            tooltip: { formatter: p => `${names[p.value[0]]} ↔ ${names[p.value[1]]}<br/>相似度: ${p.value[2]}` },
+            grid: { top: 50, left: 90, bottom: 75, right: 20 },
+            xAxis: { type: 'category', data: names, axisLabel: { rotate: 45, fontSize: 9, margin: 10 } },
+            yAxis: { type: 'category', data: names, axisLabel: { fontSize: 9 } },
+            visualMap: { min: 0, max: 1, calculable: true, orient: 'horizontal', left: 'center', top: 5, inRange: { color: ['#f0f0f0', '#556B2F', '#DAA520', '#8B4513'] } },
+            series: [{ type: 'heatmap', data: similarityData, label: { show: true, fontSize: 9 }, emphasis: { itemStyle: { shadowBlur: 10 } } }]
+        });
+    })();
+
+    // --- 厚生土墙隔热效果（含回归曲线） ---
+    (function() {
+        const chart = initChart('wallThicknessChart');
+        if (!chart) return;
+        const w = [20, 40, 60, 80, 100];
+        const t = [3, 6, 9, 11, 12];
+        // 二次回归拟合
+        const xs = w.map(v => v / 100), ys = t;
+        const n = 5;
+        let sx = 0, sx2 = 0, sx3 = 0, sx4 = 0, sy = 0, sxy = 0, sx2y = 0;
+        for (let i = 0; i < n; i++) {
+            const x = xs[i], y = ys[i], x2 = x*x;
+            sx += x; sx2 += x2; sx3 += x2*x; sx4 += x2*x2;
+            sy += y; sxy += x*y; sx2y += x2*y;
+        }
+        const denom = n*sx2*sx4 + 2*sx*sx2*sx3 - n*sx3*sx3 - sx*sx*sx4 - sx2*sx2*sx2;
+        const a = (sy*sx2*sx4 + sxy*sx3*sx2 + sx2y*sx*sx3 - sx2*sx2*sx2y - sxy*sx*sx4 - sy*sx3*sx3) / denom;
+        const b = (n*sxy*sx4 + sy*sx3*sx2 + sx*sx2*sx2y - sx2*sx2*sxy - n*sx3*sx2y - sy*sx*sx4) / denom;
+        const c = (n*sx2*sx2y + sx*sxy*sx2 + sx*sx3*sy - sx2*sx2*sx2y - n*sx3*sxy - sx*sx*sx2y) / denom;
+        const fitCurve = w.map(v => { const x = v/100; return +(a + b*x + c*x*x).toFixed(2); });
+        chart.setOption({
+            tooltip: { trigger: 'axis' },
+            legend: { top: 5, textStyle: { fontSize: 11 }, itemWidth: 14, itemHeight: 10 },
+            grid: { top: 45, right: 25, bottom: 50, left: 55 },
+            xAxis: { type: 'category', data: w.map(v => v + 'cm'), axisLabel: { fontSize: 11, margin: 12 } },
+            yAxis: { type: 'value', name: '温差 (°C)', nameLocation: 'middle', nameGap: 38 },
+            series: [
+                { name: '实测温差', type: 'bar', data: t, itemStyle: { borderRadius: [6,6,0,0], color: new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#8B4513'},{offset:1,color:'#DAA520'}]) }, barWidth: '40%' },
+                { name: '二次回归拟合', type: 'line', data: fitCurve, smooth: true, symbol: 'diamond', symbolSize: 10, lineStyle: { color: '#E63946', width: 3, type: 'dashed' }, itemStyle: { color: '#E63946' } }
+            ]
+        });
+    })();
+
+    // --- 庭院遮阳日照强度对比 ---
+    (function() {
+        const chart = initChart('courtyardShadeChart');
+        if (!chart) return;
+        chart.setOption({
+            tooltip: { trigger: 'axis' },
+            legend: { top: 5, textStyle: { fontSize: 11 }, itemWidth: 14, itemHeight: 10 },
+            grid: { top: 45, right: 25, bottom: 50, left: 60 },
+            xAxis: { type: 'category', data: ['6:00','9:00','12:00','15:00','18:00','21:00'], axisLabel: { fontSize: 11, margin: 12 } },
+            yAxis: { type: 'value', name: '日照强度 (W/m²)', nameLocation: 'middle', nameGap: 45 },
+            series: [
+                { name: '无遮阳', type: 'line', data: [200, 500, 950, 800, 400, 100], smooth: true, areaStyle: { color: 'rgba(218,165,32,0.25)' }, lineStyle: { color: '#DAA520', width: 3 }, symbol: 'circle', symbolSize: 8 },
+                { name: '有遮阳(70%削减)', type: 'line', data: [60, 150, 285, 240, 120, 30], smooth: true, areaStyle: { color: 'rgba(85,107,47,0.25)' }, lineStyle: { color: '#556B2F', width: 3 }, symbol: 'circle', symbolSize: 8 }
+            ]
+        });
+    })();
+
+    // --- 全年室内温度调节效果 ---
+    (function() {
+        const chart = initChart('tempRegulationChart');
+        if (!chart) return;
+        chart.setOption({
+            tooltip: { trigger: 'axis' },
+            legend: { top: 5, textStyle: { fontSize: 11 }, itemWidth: 14, itemHeight: 10 },
+            grid: { top: 45, right: 25, bottom: 50, left: 55 },
+            xAxis: { type: 'category', data: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'], axisLabel: { fontSize: 10, margin: 12 } },
+            yAxis: { type: 'value', name: '温度 (°C)', nameLocation: 'middle', nameGap: 38 },
+            series: [
+                { name: '室外温度', type: 'line', data: [-10,-6,3,12,18,24,28,27,20,10,2,-8], smooth: true, areaStyle: { color: 'rgba(231,111,81,0.15)' }, lineStyle: { color: '#E76F51', type: 'dashed', width: 2 }, symbol: 'diamond', symbolSize: 8 },
+                { name: '生土建筑室内', type: 'line', data: [8,9,12,16,20,23,25,25,22,18,13,9], smooth: true, areaStyle: { color: 'rgba(42,157,143,0.3)' }, lineStyle: { color: '#2A9D8F', width: 3 }, symbol: 'circle', symbolSize: 8 },
+                { name: '普通建筑室内', type: 'line', data: [3,4,8,14,20,26,30,29,24,16,8,3], smooth: true, areaStyle: { color: 'rgba(139,69,19,0.1)' }, lineStyle: { color: '#8B4513', width: 2 }, symbol: 'circle', symbolSize: 8 }
+            ]
+        });
+    })();
+
+    // --- 建筑材料热工性能对比 ---
+    (function() {
+        const chart = initChart('materialThermalChart');
+        if (!chart) return;
+        chart.setOption({
+            tooltip: { trigger: 'axis' },
+            legend: { top: 5, textStyle: { fontSize: 11 }, itemWidth: 14, itemHeight: 10 },
+            grid: { top: 45, right: 25, bottom: 50, left: 60 },
+            xAxis: { type: 'category', data: ['生土墙','土坯砖','青砖','胡杨木','芦苇','石材'], axisLabel: { fontSize: 11, margin: 12 } },
+            yAxis: { type: 'value', name: '参数值', nameLocation: 'middle', nameGap: 40 },
+            series: [
+                { name: '导热系数', type: 'bar', data: [0.58, 0.70, 0.81, 0.12, 0.06, 2.50], itemStyle: { color: '#8B4513', borderRadius: [6,6,0,0] }, barGap: '10%' },
+                { name: '蓄热系数', type: 'bar', data: [8.0, 9.5, 10.5, 3.5, 1.8, 18.0], itemStyle: { color: '#DAA520', borderRadius: [6,6,0,0] } }
+            ]
+        });
+    })();
+
+    // --- 建筑适应策略综合效能雷达图 ---
+    (function() {
+        const chart = initChart('strategyRadarChart');
+        if (!chart) return;
+        chart.setOption({
+            tooltip: {},
+            legend: { top: 5, textStyle: { fontSize: 11 }, itemWidth: 14, itemHeight: 10 },
+            radar: {
+                indicator: [
+                    { name: '隔热保温', max: 10 }, { name: '防风沙', max: 10 }, { name: '遮阳降温', max: 10 },
+                    { name: '通风换气', max: 10 }, { name: '抗震稳固', max: 10 }, { name: '采光调节', max: 10 }
+                ],
+                center: ['50%', '58%'],
+                radius: '62%',
+                shape: 'circle',
+                axisName: { fontSize: 10, margin: 10 }
+            },
+            series: [{
+                type: 'radar',
+                data: [
+                    { value: [9, 8, 5, 4, 7, 3], name: '厚生土墙', areaStyle: { color: 'rgba(139,69,19,0.35)' }, lineStyle: { color: '#8B4513', width: 2 }, itemStyle: { color: '#8B4513' } },
+                    { value: [5, 4, 9, 8, 3, 8], name: '庭院遮阳', areaStyle: { color: 'rgba(85,107,47,0.35)' }, lineStyle: { color: '#556B2F', width: 2 }, itemStyle: { color: '#556B2F' } },
+                    { value: [6, 3, 6, 9, 5, 7], name: '小窗高窗', areaStyle: { color: 'rgba(218,165,32,0.35)' }, lineStyle: { color: '#DAA520', width: 2 }, itemStyle: { color: '#DAA520' } }
+                ]
+            }]
+        });
+    })();
+
+    // --- 城市气候参数对比 ---
+    (function() {
+        const chart = initChart('cityClimateChart');
+        if (!chart) return;
+        const indicators = [
+            { name: '夏季最高温', max: 45 }, { name: '冬季最低温', max: -5 }, { name: '年日照(h)', max: 3500 },
+            { name: '年降水(mm)', max: 300 }, { name: '年均风速(m/s)', max: 3.5 }, { name: '年温差', max: 55 }
+        ];
+        chart.setOption({
+            tooltip: {},
+            legend: { top: 5, textStyle: { fontSize: 10 }, itemWidth: 12, itemHeight: 10 },
+            radar: { indicator: indicators, center: ['50%', '58%'], radius: '60%', shape: 'circle', axisName: { fontSize: 9, margin: 10 } },
+            series: [{
+                type: 'radar',
+                data: [
+                    { value: [40, 10, 3200, 16, 1.5, 50], name: '吐鲁番', areaStyle: { color: 'rgba(231,111,81,0.25)' }, lineStyle: { color: '#E76F51' }, itemStyle: { color: '#E76F51' } },
+                    { value: [33, 8, 2800, 60, 2.0, 41], name: '喀什', areaStyle: { color: 'rgba(218,165,32,0.25)' }, lineStyle: { color: '#DAA520' }, itemStyle: { color: '#DAA520' } },
+                    { value: [35, 6, 2700, 35, 2.5, 41], name: '和田', areaStyle: { color: 'rgba(139,69,19,0.25)' }, lineStyle: { color: '#8B4513' }, itemStyle: { color: '#8B4513' } },
+                    { value: [35, 20, 3080, 245, 2.8, 55], name: '伊宁', areaStyle: { color: 'rgba(85,107,47,0.25)' }, lineStyle: { color: '#556B2F' }, itemStyle: { color: '#556B2F' } }
+                ]
+            }]
+        });
+    })();
+
+    // --- 各时期文化影响维度雷达 ---
+    (function() {
+        const chart = initChart('heritageTimelineChart');
+        if (!chart) return;
+        const heritageCards = document.querySelectorAll('.arch-heritage-card');
+        const heritageIndicators = document.querySelectorAll('.arch-heritage-indicators span');
+        const dimensionToCard = [0, 1, 2, 3, 0, 2];
+        let currentHeritageCard = 0, heritageAutoTimer = null, isHovering = false;
+
+        function showHeritageCard(idx) {
+            heritageCards.forEach((c, i) => c.classList.toggle('active', i === idx));
+            heritageIndicators.forEach((d, i) => d.classList.toggle('active', i === idx));
+            currentHeritageCard = idx;
+        }
+        function startAuto() { stopAuto(); heritageAutoTimer = setInterval(() => { if (!isHovering) showHeritageCard((currentHeritageCard + 1) % 4); }, 3500); }
+        function stopAuto() { if (heritageAutoTimer) { clearInterval(heritageAutoTimer); heritageAutoTimer = null; } }
+
+        chart.setOption({
+            tooltip: {
+                formatter: p => {
+                    const dimIdx = p.dataIndex;
+                    const cardIdx = dimensionToCard[dimIdx];
+                    const titles = ['城坊制度西传','木作工艺交融','装饰纹样融合','营造智慧共生'];
+                    return `<b>${p.seriesName}</b><br/>${p.name}: ${p.value}分<br/><small>→ ${titles[cardIdx]}</small>`;
+                }
+            },
+            legend: { top: 5, textStyle: { fontSize: 11 }, itemWidth: 14, itemHeight: 10 },
+            radar: {
+                indicator: ['城坊规划','木作工艺','装饰纹样','官式做法','筑城规制','彩画艺术'].map(n => ({ name: n, max: 100 })),
+                center: ['50%', '58%'],
+                radius: '62%',
+                axisName: { fontSize: 10, margin: 10 }
+            },
+            series: [{
+                type: 'radar',
+                data: [
+                    { value: [70,50,40,60,75,45], name: '汉代', areaStyle: { color: 'rgba(178,34,52,0.25)' }, lineStyle: { color: '#B22234', width: 2 }, symbolSize: 8 },
+                    { value: [90,75,65,85,90,70], name: '唐代', areaStyle: { color: 'rgba(218,165,32,0.25)' }, lineStyle: { color: '#DAA520', width: 2 }, symbolSize: 8 },
+                    { value: [85,90,85,95,80,90], name: '清代', areaStyle: { color: 'rgba(85,107,47,0.25)' }, lineStyle: { color: '#556B2F', width: 2 }, symbolSize: 8 }
+                ]
+            }]
+        });
+
+        chart.on('mouseover', params => {
+            if (params.componentType === 'radar') {
+                const dimIdx = params.dataIndex;
+                const cardIdx = dimensionToCard[dimIdx];
+                showHeritageCard(cardIdx);
+            }
+        });
+
+        document.getElementById('heritageTimelineChart').addEventListener('mouseenter', () => { isHovering = true; });
+        document.getElementById('heritageTimelineChart').addEventListener('mouseleave', () => { isHovering = false; startAuto(); });
+        heritageIndicators.forEach((dot, i) => dot.addEventListener('click', () => { showHeritageCard(i); startAuto(); }));
+        startAuto();
+    })();
+
+    // --- 融合要素占比 ---
+    (function() {
+        const chart = initChart('fusionElementChart');
+        if (!chart) return;
+        chart.setOption({
+            tooltip: { trigger: 'item', formatter: '{b}: {d}%' },
+            legend: { top: 3, textStyle: { fontSize: 13 }, itemWidth: 14, itemHeight: 12, type: 'scroll' },
+            series: [{
+                type: 'pie',
+                radius: ['18%', '68%'],
+                center: ['50%', '55%'],
+                roseType: 'radius',
+                itemStyle: { borderRadius: 8, borderColor: '#fff', borderWidth: 2 },
+                label: {
+                    show: true,
+                    position: 'inside',
+                    formatter: '{d}%',
+                    fontSize: 10,
+                    fontWeight: 'bold',
+                    color: '#fff'
+                },
+                labelLine: { show: false },
+                emphasis: { label: { fontSize: 13, fontWeight: 'bold' } },
+                data: [
+                    { value: 20, name: '中原城坊制度', itemStyle: { color: '#8B4513' } },
+                    { value: 22, name: '中原木作工艺', itemStyle: { color: '#A0522D' } },
+                    { value: 18, name: '中原官式做法', itemStyle: { color: '#CD853F' } },
+                    { value: 18, name: '本地生土技术', itemStyle: { color: '#556B2F' } },
+                    { value: 12, name: '本地装饰纹样', itemStyle: { color: '#DAA520' } },
+                    { value: 10, name: '民族营造智慧', itemStyle: { color: '#B8860B' } }
+                ]
+            }]
+        });
+    })();
+
+    // --- 中原技艺应用强度（径向柱状图） ---
+    (function() {
+        const chart = initChart('techApplicationChart');
+        if (!chart) return;
+        const techData = [
+            { name: '抬梁式木构架', value: 85 },
+            { name: '斗拱榫卯', value: 70 },
+            { name: '城坊规划', value: 90 },
+            { name: '官式屋面', value: 75 },
+            { name: '雕花梁枋', value: 80 },
+            { name: '彩画装饰', value: 65 },
+            { name: '砖瓦工艺', value: 88 }
+        ];
+        chart.setOption({
+            tooltip: { trigger: 'item', formatter: '{b}: {c}' },
+            angleAxis: { type: 'category', data: techData.map(d => d.name), axisLabel: { fontSize: 10, interval: 0, margin: 10 } },
+            radiusAxis: { type: 'value', max: 100, axisLabel: { fontSize: 9 } },
+            polar: { radius: ['10%', '75%'], center: ['50%', '48%'] },
+            series: [{
+                type: 'bar',
+                data: techData.map(d => d.value),
+                coordinateSystem: 'polar',
+                label: {
+                    show: true,
+                    position: 'middle',
+                    formatter: '{c}',
+                    fontSize: 11,
+                    color: '#fff',
+                    fontWeight: 'bold'
+                },
+                itemStyle: {
+                    borderRadius: [5, 5, 0, 0],
+                    color: params => new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: ['#E63946', '#F4A261', '#2A9D8F', '#264653', '#E76F51', '#8338EC', '#FFB703'][params.dataIndex] },
+                        { offset: 1, color: '#8B4513' }
+                    ])
+                },
+                barWidth: '60%',
+                emphasis: { itemStyle: { shadowBlur: 10 } }
+            }]
+        });
+    })();
+
+    // --- 各民族建筑技艺贡献（力导向关系图） ---
+    (function() {
+        const dom = document.getElementById('ethnicContributionChart');
+        if (!dom) return;
+        const chart = echarts.init(dom);
+        window.addEventListener('resize', () => chart.resize());
+        setTimeout(() => chart.resize(), 0);
+
+        const categories = [
+            { name: '木作体系' }, { name: '城坊规划' }, { name: '砖瓦工艺' },
+            { name: '生土技术' }, { name: '砖雕装饰' }, { name: '毡房营造' },
+            { name: '石屋技艺' }
+        ];
+        const nationCats = [
+            { name: '汉族' }, { name: '维吾尔族' }, { name: '回族' },
+            { name: '哈萨克族' }, { name: '蒙古族' }, { name: '塔吉克族' }
+        ];
+        const allCats = [...nationCats, ...categories];
+        const ethColors = ['#4A6FA5', '#6B8E23', '#DAA520', '#E76F51', '#264653', '#E63946'];
+        const techColors = ['#8B4513','#A0522D','#CD853F','#7A9B4F','#C49A6C','#DEB887','#B8860B'];
+
+        function buildOption() {
+            const width = dom.clientWidth || 1000;
+            const height = dom.clientHeight || 500;
+            const nationX = width * 0.22;
+            const techX = width * 0.78;
+            const nationCount = nationCats.length;
+            const techCount = categories.length;
+            const spacing = height * 0.72;
+            const startY = height * 0.14;
+
+            const nodes = [
+                ...nationCats.map((c, i) => {
+                    const t = nationCount === 1 ? 0.5 : i / (nationCount - 1);
+                    return {
+                        name: c.name,
+                        symbolSize: [68, 62, 54, 50, 46, 44][i],
+                        category: i,
+                        x: nationX,
+                        y: startY + t * spacing,
+                        itemStyle: { color: ethColors[i], borderColor: '#fff', borderWidth: 2.5 }
+                    };
+                }),
+                ...categories.map((c, i) => {
+                    const t = techCount === 1 ? 0.5 : i / (techCount - 1);
+                    return {
+                        name: c.name,
+                        symbolSize: 40,
+                        category: i + nationCount,
+                        x: techX,
+                        y: startY + t * spacing,
+                        itemStyle: { color: techColors[i], borderColor: '#fff', borderWidth: 2 }
+                    };
+                })
+            ];
+            const edges = [
+                { source: '汉族', target: '木作体系', value: 40, lineStyle: { width: 6 } },
+                { source: '汉族', target: '城坊规划', value: 35, lineStyle: { width: 5.5 } },
+                { source: '汉族', target: '砖瓦工艺', value: 30, lineStyle: { width: 5 } },
+                { source: '维吾尔族', target: '木作体系', value: 20, lineStyle: { width: 3.5 } },
+                { source: '维吾尔族', target: '生土技术', value: 38, lineStyle: { width: 6 } },
+                { source: '维吾尔族', target: '砖雕装饰', value: 35, lineStyle: { width: 5.5 } },
+                { source: '回族', target: '砖瓦工艺', value: 28, lineStyle: { width: 4.5 } },
+                { source: '回族', target: '木作体系', value: 18, lineStyle: { width: 3 } },
+                { source: '哈萨克族', target: '毡房营造', value: 35, lineStyle: { width: 5.5 } },
+                { source: '哈萨克族', target: '木作体系', value: 12, lineStyle: { width: 2.5 } },
+                { source: '蒙古族', target: '毡房营造', value: 25, lineStyle: { width: 4 } },
+                { source: '蒙古族', target: '木作体系', value: 15, lineStyle: { width: 3 } },
+                { source: '塔吉克族', target: '石屋技艺', value: 30, lineStyle: { width: 5 } },
+                { source: '塔吉克族', target: '生土技术', value: 15, lineStyle: { width: 3 } },
+            ];
+            return {
+                tooltip: { trigger: 'item', backgroundColor: 'rgba(93,64,55,0.92)', borderColor: '#DAA520', textStyle: { color: '#fff', fontSize: 12 }, formatter: p => p.dataType === 'edge' ? `${p.data.source} → ${p.data.target}<br/>贡献强度: ${p.data.value}` : `<strong>${p.name}</strong>` },
+                legend: {
+                    orient: 'vertical',
+                    right: 10,
+                    top: 'middle',
+                    textStyle: { fontSize: 10, color: '#5D4037' },
+                    itemWidth: 12,
+                    itemHeight: 12,
+                    itemGap: 6
+                },
+                series: [{
+                    type: 'graph',
+                    layout: 'force',
+                    top: 15,
+                    bottom: 15,
+                    left: 15,
+                    right: 120,
+                    force: {
+                        repulsion: 300,
+                        edgeLength: [60, 120],
+                        gravity: 0.08,
+                        friction: 0.1,
+                        layoutAnimation: true
+                    },
+                    roam: false,
+                    draggable: true,
+                    data: nodes,
+                    edges: edges,
+                    categories: allCats,
+                    label: { show: true, fontSize: 12, color: '#fff', fontWeight: 'bold', position: 'inside' },
+                    labelLayout: { hideOverlap: false },
+                    emphasis: { focus: 'adjacency', label: { fontSize: 15, fontWeight: 'bold', color: '#fff' }, scale: true, lineStyle: { width: 8 } },
+                    lineStyle: { color: 'source', curveness: 0.18, opacity: 0.7 },
+                    edgeSymbol: ['none', 'arrow'],
+                    edgeSymbolSize: [0, 7]
+                }]
+            };
+        }
+        chart.setOption(buildOption());
+
+        const ro = new ResizeObserver(() => {
+            chart.setOption(buildOption());
+        });
+        ro.observe(dom);
+    })();
+
+    // 所有ECharts实例响应窗口大小变化
+    window.addEventListener('resize', () => {
+        document.querySelectorAll('.echart-container, .echart-container-tall, .echart-container-wide, .echart-container-chord').forEach(dom => {
+            const instance = echarts.getInstanceByDom(dom);
+            if (instance) instance.resize();
+        });
+    });
+
+    // 初始化后强制 resize 一次，确保适配容器实际高度
+    setTimeout(() => {
+        document.querySelectorAll('.echart-container, .echart-container-tall, .echart-container-wide, .echart-container-chord').forEach(dom => {
+            const instance = echarts.getInstanceByDom(dom);
+            if (instance) instance.resize();
+        });
+    }, 300);
+
+    // --- 展示图叠加轮播 ---
+    document.querySelectorAll('.arch-showcase-images').forEach(container => {
+        const imgs = container.querySelectorAll('img');
+        if (imgs.length < 2) return;
+        imgs[0].classList.add('active');
+        let idx = 0;
+        setInterval(() => {
+            imgs[idx].classList.remove('active');
+            idx = (idx + 1) % imgs.length;
+            imgs[idx].classList.add('active');
+        }, 3500);
+    });
+
+    console.log('Architecture charts initialized with ECharts + PCA/K-Means/Correlation analysis');
+    </script>
+
+    <!-- 引入公共脚本（音乐控制、返回顶部等） -->
+    <script>
+    // 覆盖 initArchitectureCharts 为空函数，避免 Chart.js 冲突
+    if (typeof window.initArchitectureChartsOriginal === 'undefined') {
+        window._archOverride = true;
+    }
+    </script>
+    <script src="script.js"></script>
+    <script>
+    // 如果 script.js 中定义了 initArchitectureCharts，则置为空（避免对 div 元素误用 Chart.js）
+    if (typeof initArchitectureCharts === 'function') {
+        initArchitectureCharts = function() {};
+    }
+    </script>
+</body>
+</html>

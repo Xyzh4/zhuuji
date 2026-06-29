@@ -1,0 +1,1196 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>维吾尔族 - 新疆民族文化数字化平台</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- 引入 Chart.js 用于数据可视化 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 引入 ECharts 用于地图和复杂可视化 -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+</head>
+<body>
+    <header class="header" style="background-color: rgba(139, 69, 19, 0.95);">
+        <div class="logo">维吾尔族文化</div>
+        <div class="nav-buttons">
+            <a href="ethnic.html" class="back-button">疆俗·看民俗</a>
+        </div>
+    </header>
+    
+    <!-- 背景音乐 -->
+    <audio id="background-music" loop autoplay>
+        <source src="新疆美丽公主组合 - Oynasun.mp3" type="audio/mpeg">
+        您的浏览器不支持音频播放
+    </audio>
+    <div class="music-control">
+        <button id="music-toggle" class="music-btn">🔊</button>
+    </div>
+
+    <section class="ethnic-detail-section">
+        <!-- 1. 民族概况卡片 -->
+        <div id="overview" class="section-card ethnic-profile-card">
+            <div class="profile-content">
+                <div class="profile-text">
+                    <h1>维吾尔族</h1>
+                    <p class="intro">维吾尔族是新疆的主体民族之一，有着悠久的历史和灿烂的文化。维吾尔族人民在长期的历史发展过程中，创造了丰富多彩的文化艺术，包括音乐、舞蹈、文学、建筑等多个领域。他们的传统服饰色彩鲜艳，饮食文化独特，节日庆典热闹非凡，展现了浓郁的民族特色。</p>
+                    <h2>民族概况</h2>
+                    <div class="profile-info-horizontal">
+                        <div class="info-group">
+                            <h3>基本信息</h3>
+                            <p><strong>民族名称：</strong>维吾尔族 / ئۇيغۇر يېزىگى</p>
+                            <p><strong>人口数量：</strong>约1162万</p>
+                            <p><strong>人口占比：</strong>约45.8%</p>
+                            <p><strong>主要分布：</strong>新疆天山以南地区，如喀什、和田、阿克苏等</p>
+                        </div>
+                        <div class="info-group">
+                            <h3>文化特征</h3>
+                            <p><strong>语言系属：</strong>阿尔泰语系突厥语族</p>
+                            <p><strong>文字：</strong>维吾尔文（阿拉伯字母体系）</p>
+                            <p><strong>宗教信仰：</strong>伊斯兰教</p>
+                            <p><strong>传统节日：</strong>诺鲁孜节、肉孜节、古尔邦节</p>
+                        </div>
+                        <div class="info-group">
+                            <h3>常用维吾尔语</h3>
+                            <div class="phrase-item">
+                                <p><strong>你好：</strong>亚克西姆斯孜 (Yakşımsız)</p>
+                                <audio controls>
+                                    <source src="ياخشى….mp3" type="audio/mpeg">
+                                    您的浏览器不支持音频播放
+                                </audio>
+                            </div>
+                            <div class="phrase-item">
+                                <p><strong>谢谢：</strong>热合麦特 (Rahmat)</p>
+                                <audio controls>
+                                    <source src="رەھمە….mp3" type="audio/mpeg">
+                                    您的浏览器不支持音频播放
+                                </audio>
+                            </div>
+                        </div>
+                        <div class="info-group">
+                            <h3>维吾尔族文字</h3>
+                            <p>维吾尔文是维吾尔族使用的文字，属于阿拉伯字母体系。</p>
+                            <p>维吾尔文示例：</p>
+                            <p style="font-size: 1.2rem; font-weight: bold; direction: rtl;">ئۇيغۇر يېزىگى</p>
+                            <p style="font-size: 1.2rem; font-weight: bold; direction: rtl;">جۇڭگو خەلق جۇمھۇرىيىتى</p>
+                            <p style="font-size: 1.2rem; font-weight: bold; direction: rtl;">شىنجاڭ ئۇيغۇر ئاپتونوم رايونى</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-image">
+                    <img src="5c037e8fbbc574904ce459cae8d0c9e6.jpg" alt="维吾尔族文化">
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 历史文化时间轴 -->
+        <div id="history" class="section-card">
+            <h2>历史文化时间轴</h2>
+            <div class="horizontal-timeline">
+                <div class="timeline-axis"></div>
+                <div class="timeline-track">
+                    <div class="timeline-item horizontal" onclick="showTimelineCard('民族起源', '维吾尔族的先民丁零人在贝加尔湖一带活动，他们是游牧民族，以狩猎和放牧为生。', 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ancient%20central%20asian%20nomadic%20people%20life%2C%20historical%20scene&image_size=landscape_4_3')">
+                        <div class="timeline-date small">公元前3世纪</div>
+                        <div class="timeline-content">
+                            <h3>民族起源</h3>
+                            <p>维吾尔族的先民丁零人在贝加尔湖一带活动</p>
+                            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ancient%20central%20asian%20nomadic%20people%20life%2C%20historical%20scene&image_size=landscape_4_3" alt="民族起源" class="timeline-image small">
+                        </div>
+                    </div>
+                    <div class="timeline-item horizontal" onclick="showTimelineCard('回纥汗国', '公元744年，回纥首领骨力裴罗建立回纥汗国，后改名为回鹘。回鹘汗国与唐朝保持着密切的政治、经济和文化联系。', 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ancient%20Uyghur%20khaganate%20historical%20scene%2C%20central%20asia&image_size=landscape_4_3')">
+                        <div class="timeline-date small">公元7世纪</div>
+                        <div class="timeline-content">
+                            <h3>回纥汗国</h3>
+                            <p>建立了回纥汗国，后改名为回鹘</p>
+                            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ancient%20Uyghur%20khaganate%20historical%20scene%2C%20central%20asia&image_size=landscape_4_3" alt="回纥汗国" class="timeline-image small">
+                        </div>
+                    </div>
+                    <div class="timeline-item horizontal" onclick="showTimelineCard('喀喇汗王朝', '西迁的回鹘人在中亚地区建立了喀喇汗王朝，这一时期维吾尔族的文化得到了很大发展，尤其是在文学、艺术和宗教方面。', 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Karakhanid%20dynasty%20historical%20architecture%20and%20culture&image_size=landscape_4_3')">
+                        <div class="timeline-date small">公元10世纪</div>
+                        <div class="timeline-content">
+                            <h3>喀喇汗王朝</h3>
+                            <p>西迁的回鹘人建立了喀喇汗王朝</p>
+                            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Karakhanid%20dynasty%20historical%20architecture%20and%20culture&image_size=landscape_4_3" alt="喀喇汗王朝" class="timeline-image small">
+                        </div>
+                    </div>
+                    <div class="timeline-item horizontal" onclick="showTimelineCard('蒙古西征', '13世纪，蒙古帝国西征，维吾尔族地区纳入蒙古帝国版图。这一时期，维吾尔族与其他民族的交流更加频繁。', 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Mongol%20empire%20西征%20central%20asia%20historical%20scene&image_size=landscape_4_3')">
+                        <div class="timeline-date small">公元13世纪</div>
+                        <div class="timeline-content">
+                            <h3>蒙古西征</h3>
+                            <p>蒙古西征，维吾尔族地区纳入蒙古帝国版图</p>
+                            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Mongol%20empire%20西征%20central%20asia%20historical%20scene&image_size=landscape_4_3" alt="蒙古西征" class="timeline-image small">
+                        </div>
+                    </div>
+                    <div class="timeline-item horizontal" onclick="showTimelineCard('新疆和平解放', '1949年9月25日，新疆和平解放，维吾尔族人民进入新的历史时期。在中国共产党的领导下，新疆的经济、文化和社会各项事业得到了迅速发展。', 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20peaceful%20liberation%201949%2C%20historical%20scene&image_size=landscape_4_3')">
+                        <div class="timeline-date small">1949年</div>
+                        <div class="timeline-content">
+                            <h3>新疆和平解放</h3>
+                            <p>维吾尔族人民进入新的历史时期</p>
+                            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20peaceful%20liberation%201949%2C%20historical%20scene&image_size=landscape_4_3" alt="新疆和平解放" class="timeline-image small">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 互动体验模块 -->
+        <div id="experience" class="section-card">
+            <h2>互动体验</h2>
+            <div class="experience-grid">
+                <div class="experience-card">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Uyghur%20naan%20bread%20making%20traditional%20workshop&amp;image_size=landscape_4_3" alt="打馕工坊">
+                    <h3>打馕工坊</h3>
+                    <p>体验传统维吾尔族馕的制作过程，了解馕的历史和文化</p>
+                    <button class="experience-btn" onclick="startExperience('打馕工坊')">开始体验</button>
+                </div>
+                <div class="experience-card">
+                    <img src="708cbfc429b19ff6bc87d2f48ecb9211.jpg" alt="逛巴扎">
+                    <h3>逛巴扎</h3>
+                    <p>体验新疆传统市场的热闹氛围，了解当地的商品和文化</p>
+                    <button class="experience-btn" onclick="startExperience('逛巴扎')">开始体验</button>
+                </div>
+                <div class="experience-card">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Uyghur%20traditional%20dance%20performance&amp;image_size=landscape_4_3" alt="维吾尔族传统舞蹈">
+                    <h3>维吾尔族传统舞蹈</h3>
+                    <p>学习和体验维吾尔族的传统舞蹈艺术，感受民族文化的魅力</p>
+                    <button class="experience-btn" onclick="startExperience('维吾尔族传统舞蹈')">开始体验</button>
+                </div>
+                <div class="experience-card">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Uyghur%20traditional%20musical%20instruments%20dutar%20rawap&amp;image_size=landscape_4_3" alt="维吾尔族传统乐器体验">
+                    <h3>维吾尔族传统乐器体验</h3>
+                    <p>学习和体验维吾尔族的传统乐器，了解音乐文化</p>
+                    <button class="experience-btn" onclick="startExperience('维吾尔族传统乐器体验')">开始体验</button>
+                </div>
+                <div class="experience-card">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Uyghur%20traditional%20embroidery%20handicraft&amp;image_size=landscape_4_3" alt="维吾尔族刺绣">
+                    <h3>维吾尔族刺绣</h3>
+                    <p>学习维吾尔族的传统刺绣，了解手工艺文化</p>
+                    <button class="experience-btn" onclick="startExperience('维吾尔族刺绣')">开始体验</button>
+                </div>
+                <div class="experience-card">
+                    <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Xinjiang%20Uyghur%20traditional%20food%20cooking%20pilaf%20kebab&amp;image_size=landscape_4_3" alt="维吾尔族美食制作">
+                    <h3>维吾尔族美食制作</h3>
+                    <p>学习制作正宗的维吾尔族美食，了解饮食文化</p>
+                    <button class="experience-btn" onclick="startExperience('维吾尔族美食制作')">开始体验</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 文化特色可视化 -->
+        <div id="culture" class="section-card">
+            <h2>文化特色可视化</h2>
+            <div class="culture-layout">
+                <div class="culture-left">
+                    <div class="culture-menu">
+                        <div class="menu-item active" data-feature="fashion">
+                            <h3>服饰文化</h3>
+                        </div>
+                        <div class="menu-item" data-feature="music">
+                            <h3>音乐舞蹈</h3>
+                        </div>
+                        <div class="menu-item" data-feature="architecture">
+                            <h3>建筑风格</h3>
+                        </div>
+                        <div class="menu-item" data-feature="crafts">
+                            <h3>手工艺</h3>
+                        </div>
+                    </div>
+                    <div class="culture-radar">
+                        <canvas id="cultureRadarChart"></canvas>
+                    </div>
+                </div>
+                <div class="culture-content">
+                    <div class="content-panel active" id="fashion-content">
+                        <h3>服饰文化</h3>
+                        <div class="content-items">
+                            <div class="content-item">
+                                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Uygur%20traditional%20clothing%20elements&amp;image_size=landscape_4_3" alt="袷袢">
+                                <h4>袷袢</h4>
+                                <p>袷袢是维吾尔族男子的传统服饰，通常用彩色绸缎或布料制成，右衽斜领，无纽扣，用长方巾扎腰。</p>
+                            </div>
+                            <div class="content-item">
+                                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Uygur%20traditional%20hat%20flower%20cap&amp;image_size=landscape_4_3" alt="花帽">
+                                <h4>花帽</h4>
+                                <p>花帽作为维吾尔族服饰的重要组成部分，种类繁多，有巴旦木花帽、奇曼花帽、曼波尔花帽等。</p>
+                            </div>
+                            <div class="content-item">
+                                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Uygur%20traditional%20silk%20dress&amp;image_size=landscape_4_3" alt="艾德莱斯绸连衣裙">
+                                <h4>艾德莱斯绸连衣裙</h4>
+                                <p>女子的艾德莱斯绸连衣裙色彩斑斓，图案精美，体现了维吾尔族独特的审美情趣。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-panel" id="music-content">
+                        <h3>音乐舞蹈</h3>
+                        <div class="content-items">
+                            <div class="content-item">
+                                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Uygur%20traditional%20musical%20instruments&amp;image_size=landscape_4_3" alt="热瓦甫">
+                                <h4>热瓦甫</h4>
+                                <p>热瓦甫是维吾尔族最具代表性的弹拨乐器之一，音色明亮、清脆。</p>
+                            </div>
+                            <div class="content-item">
+                                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Uygur%20hand%20drum%20tambourine&amp;image_size=landscape_4_3" alt="手鼓">
+                                <h4>手鼓</h4>
+                                <p>手鼓是维吾尔族乐队中不可或缺的打击乐器，节奏感强烈。</p>
+                            </div>
+                            <div class="content-item">
+                                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Uygur%20Meshrep%20traditional%20dance&amp;image_size=landscape_4_3" alt="麦西热甫">
+                                <h4>麦西热甫</h4>
+                                <p>麦西热甫是维吾尔族人民喜闻乐见的传统歌舞娱乐活动，集歌、舞、乐于一体。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-panel" id="architecture-content">
+                        <h3>建筑风格</h3>
+                        <div class="content-items">
+                            <div class="content-item">
+                                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Uygur%20traditional%20architecture&amp;image_size=landscape_4_3" alt="阿以旺">
+                                <h4>阿以旺</h4>
+                                <p>阿以旺是维吾尔族民居中最常见的建筑形式，意为"明亮的处所"，有天窗的夏室。土木结构、庭院式布局、装饰精美。</p>
+                            </div>
+                            <div class="content-item">
+                                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Kashgar%20old%20city%20gaotai%20residence&amp;image_size=landscape_4_3" alt="高台民居">
+                                <h4>高台民居</h4>
+                                <p>高台民居是喀什地区特有的古老民居建筑群落，已有600多年历史。土木结构、庭院式布局、装饰精美。</p>
+                            </div>
+                            <div class="content-item">
+                                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Uygur%20mosque%20islamic%20architecture&amp;image_size=landscape_4_3" alt="清真寺">
+                                <h4>清真寺</h4>
+                                <p>维吾尔族清真寺建筑宏伟壮观，装饰精美，体现了伊斯兰建筑艺术与维吾尔族传统建筑艺术的完美结合。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-panel" id="crafts-content">
+                        <h3>手工艺</h3>
+                        <div class="content-items">
+                            <div class="content-item">
+                                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Uygur%20艾德莱斯绸%20silk%20fabric&amp;image_size=landscape_4_3" alt="艾德莱斯绸">
+                                <h4>艾德莱斯绸</h4>
+                                <p>艾德莱斯绸是维吾尔族特有的传统丝绸织品，采用古老的扎染工艺，色彩艳丽，图案独特。</p>
+                            </div>
+                            <div class="content-item">
+                                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Uygur%20carpet%20weaving%20traditional&amp;image_size=landscape_4_3" alt="维吾尔族地毯">
+                                <h4>维吾尔族地毯</h4>
+                                <p>维吾尔族地毯以其精美的图案、优良的质地和精湛的工艺闻名于世。</p>
+                            </div>
+                            <div class="content-item">
+                                <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Uygur%20traditional%20handicrafts%20flower%20hat%20wood%20carving&amp;image_size=landscape_4_3" alt="花帽与木雕">
+                                <h4>花帽与木雕</h4>
+                                <p>花帽是维吾尔族服饰的重要组成部分，种类繁多。维吾尔族木雕工艺同样令人叹为观止，图案精美，线条流畅。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 非遗项目展示 -->
+        <div id="heritage" class="section-card">
+            <h2>非遗项目展示</h2>
+            <div class="heritage-content">
+                <div class="heritage-left">
+                    <div class="heritage-stats">
+                        <div class="stat-item">
+                            <h4>国家级非遗</h4>
+                            <p>28项</p>
+                        </div>
+                        <div class="stat-item">
+                            <h4>自治区级非遗</h4>
+                            <p>120项</p>
+                        </div>
+                        <div class="stat-item">
+                            <h4>市级非遗</h4>
+                            <p>350项</p>
+                        </div>
+                    </div>
+                    <div class="heritage-chart">
+                        <h4>非遗分类占比</h4>
+                        <div class="chart" id="heritage-chart">
+                            <canvas id="heritageBarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="heritage-video">
+                    <h4>非遗文化展示</h4>
+                    <video controls>
+                        <source src="4月17日(2).mp4" type="video/mp4">
+                        您的浏览器不支持视频播放
+                    </video>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <h3>新疆民族文化数字化平台</h3>
+                <p>弘扬民族文化，促进文旅融合</p>
+            </div>
+            <div class="footer-links">
+                <ul>
+                    <li><a href="index.html#home">首页</a></li>
+                    <li><a href="index.html#ethnic">民族看板</a></li>
+                    <li><a href="index.html#timeline">特色节目</a></li>
+                    <li><a href="index.html#map">文化地图</a></li>
+                    <li><a href="index.html#calendar">节日日历</a></li>
+                    <li><a href="index.html#experience">互动体验</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 疆来筑迹 版权所有</p>
+        </div>
+    </footer>
+
+    <!-- 回到顶部按钮 -->
+    <button id="back-to-top" class="back-to-top" title="回到顶部">⬆ 返回顶部</button>
+
+    <script>
+        // 音乐控制功能（直接在页面中实现）
+        function initLocalMusicControl() {
+            const music = document.getElementById('background-music');
+            const toggleBtn = document.getElementById('music-toggle');
+            
+            if (music && toggleBtn) {
+                // 设置音量为一半（50%）
+                music.volume = 0.5;
+                
+                // 从 localStorage 恢复播放状态
+                const savedTime = localStorage.getItem('musicCurrentTime');
+                const savedMuted = localStorage.getItem('musicMuted');
+                const savedPlaying = localStorage.getItem('musicPlaying');
+                
+                if (savedTime) {
+                    music.currentTime = parseFloat(savedTime);
+                }
+                if (savedMuted !== null) {
+                    music.muted = savedMuted === 'true';
+                }
+                
+                // 设置初始按钮状态
+                if (music.muted) {
+                    toggleBtn.textContent = '🔇';
+                } else {
+                    toggleBtn.textContent = '🔊';
+                }
+                
+                // 尝试自动播放
+                if (savedPlaying === 'true') {
+                    music.play().catch(function() {
+                        music.muted = true;
+                        toggleBtn.textContent = '🔇';
+                    });
+                }
+                
+                toggleBtn.addEventListener('click', function() {
+                    console.log('Music button clicked!', music.muted);
+                    if (music.muted) {
+                        music.muted = false;
+                        toggleBtn.textContent = '🔊';
+                        music.play().catch(() => {});
+                    } else {
+                        music.muted = true;
+                        toggleBtn.textContent = '🔇';
+                    }
+                    localStorage.setItem('musicMuted', music.muted);
+                });
+                
+                // 保存播放时间
+                music.addEventListener('timeupdate', function() {
+                    localStorage.setItem('musicCurrentTime', music.currentTime);
+                });
+                
+                // 保存播放状态
+                music.addEventListener('play', function() {
+                    localStorage.setItem('musicPlaying', 'true');
+                });
+                music.addEventListener('pause', function() {
+                    localStorage.setItem('musicPlaying', 'false');
+                });
+            }
+        }
+        
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化本地音乐控制
+            initLocalMusicControl();
+            
+            // 初始化图表
+            initCharts();
+            
+            // 初始化分布地图
+            initDistributionMap();
+            
+            // 平滑滚动效果
+            smoothScroll();
+            
+            // 初始化文化特色切换功能
+            initCultureFeatureSwitch();
+            
+            // 初始化文化特色雷达图
+            initCultureRadarChart();
+            
+            // 处理URL哈希，确保从其他页面跳转过来时能正确显示大标题
+            if (window.location.hash) {
+                const targetId = window.location.hash;
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 150,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        });
+
+        // 初始化文化特色切换功能
+        function initCultureFeatureSwitch() {
+            const menuItems = document.querySelectorAll('.menu-item');
+            const contentPanels = document.querySelectorAll('.content-panel');
+            
+            menuItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    const feature = this.getAttribute('data-feature');
+                    
+                    // 移除所有菜单项的active类
+                    menuItems.forEach(mi => mi.classList.remove('active'));
+                    // 添加当前菜单项的active类
+                    this.classList.add('active');
+                    
+                    // 隐藏所有内容面板
+                    contentPanels.forEach(panel => panel.classList.remove('active'));
+                    // 显示对应的内容面板
+                    const targetPanel = document.getElementById(feature + '-content');
+                    if (targetPanel) {
+                        targetPanel.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        // 初始化文化特色雷达图
+        function initCultureRadarChart() {
+            const radarCtx = document.getElementById('cultureRadarChart');
+            if (!radarCtx) return;
+
+            new Chart(radarCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['服饰色彩', '音乐节奏', '建筑装饰', '手工艺精细度', '文化传承'],
+                    datasets: [{
+                        label: '维吾尔族文化特色',
+                        data: [95, 90, 85, 92, 88],
+                        backgroundColor: 'rgba(139, 69, 19, 0.2)',
+                        borderColor: 'rgba(139, 69, 19, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(139, 69, 19, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(139, 69, 19, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // 初始化图表
+        function initCharts() {
+            // 非遗分类占比饼图
+            const heritageCtx = document.getElementById('heritagePieChart');
+            if (heritageCtx) {
+                new Chart(heritageCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['传统音乐', '传统舞蹈', '传统戏剧', '传统美术', '传统技艺', '传统医药', '民俗'],
+                        datasets: [{
+                            data: [5, 4, 2, 6, 8, 1, 2],
+                            backgroundColor: [
+                                '#FF6384',
+                                '#36A2EB',
+                                '#FFCE56',
+                                '#4BC0C0',
+                                '#9966FF',
+                                '#FF9F40',
+                                '#C9CBCF'
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 节日类型分布饼图
+            const festivalCtx = document.getElementById('festivalPieChart');
+            if (festivalCtx) {
+                new Chart(festivalCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['宗教节日', '农事节日', '民俗节日'],
+                        datasets: [{
+                            data: [2, 1, 0],
+                            backgroundColor: [
+                                '#FF6384',
+                                '#36A2EB',
+                                '#FFCE56'
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 烹饪方式统计柱状图
+            const cookingCtx = document.getElementById('cookingBarChart');
+            if (cookingCtx) {
+                new Chart(cookingCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['烤', '煮', '蒸', '炸', '炒'],
+                        datasets: [{
+                            label: '使用频率',
+                            data: [8, 5, 3, 2, 4],
+                            backgroundColor: 'rgba(139, 69, 19, 0.8)',
+                            borderColor: 'rgba(139, 69, 19, 1)',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 食材来源分析饼图
+            const ingredientsCtx = document.getElementById('ingredientsPieChart');
+            if (ingredientsCtx) {
+                new Chart(ingredientsCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['肉类', '谷物', '蔬菜', '水果', '奶制品'],
+                        datasets: [{
+                            data: [30, 25, 20, 15, 10],
+                            backgroundColor: [
+                                '#FF6384',
+                                '#36A2EB',
+                                '#FFCE56',
+                                '#4BC0C0',
+                                '#9966FF'
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // 初始化分布地图
+        function initDistributionMap() {
+            const mapEl = document.getElementById('distribution-map');
+            if (!mapEl) return;
+
+            const chart = echarts.init(mapEl);
+            
+            const option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: function(params) {
+                        return params.name;
+                    }
+                },
+                visualMap: {
+                    min: 0,
+                    max: 100,
+                    left: 'left',
+                    top: 'bottom',
+                    text: ['高', '低'],
+                    calculable: true,
+                    inRange: {
+                        color: ['#f0f9ff', '#bae4bc', '#7bccc4', '#43a2ca', '#0868ac', '#084081']
+                    }
+                },
+                series: [
+                    {
+                        name: '维吾尔族分布',
+                        type: 'map',
+                        map: 'china',
+                        roam: true,
+                        emphasis: {
+                            label: {
+                                show: true
+                            },
+                            itemStyle: {
+                                areaColor: '#2a333d'
+                            }
+                        },
+                        data: [
+                            {
+                                name: '新疆',
+                                value: 90
+                            }
+                        ]
+                    }
+                ]
+            };
+            
+            chart.setOption(option);
+            
+            window.addEventListener('resize', function() {
+                chart.resize();
+            });
+        }
+
+        // 平滑滚动功能
+        function smoothScroll() {
+            const navLinks = document.querySelectorAll('a[href^="#"]');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 150,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        }
+
+        // 页面滚动效果
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 100) {
+                header.style.backgroundColor = 'rgba(139, 69, 19, 0.95)';
+            } else {
+                header.style.backgroundColor = '#8B4513';
+            }
+            
+            // 显示/隐藏回到顶部按钮
+            const backToTopBtn = document.getElementById('back-to-top');
+            if (backToTopBtn) {
+                if (window.scrollY > 300) {
+                    backToTopBtn.classList.add('show');
+                } else {
+                    backToTopBtn.classList.remove('show');
+                }
+            }
+        });
+
+        // 回到顶部按钮功能
+        const backToTopBtn = document.getElementById('back-to-top');
+        if (backToTopBtn) {
+            backToTopBtn.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        }
+
+        // 轮播功能
+        let slideIndex = 0;
+        
+        function moveCarousel(n) {
+            showSlides(slideIndex += n);
+        }
+        
+        function currentSlide(n) {
+            showSlides(slideIndex = n);
+        }
+        
+        function showSlides(n) {
+            let i;
+            let slides = document.getElementsByClassName("carousel-slide");
+            let indicators = document.getElementsByClassName("indicator");
+            
+            if (n >= slides.length) {
+                slideIndex = 0;
+            }
+            if (n < 0) {
+                slideIndex = slides.length - 1;
+            }
+            
+            for (i = 0; i < slides.length; i++) {
+                slides[i].classList.remove("active");
+            }
+            
+            for (i = 0; i < indicators.length; i++) {
+                indicators[i].classList.remove("active");
+            }
+            
+            slides[slideIndex].classList.add("active");
+            indicators[slideIndex].classList.add("active");
+        }
+
+        // 自动轮播
+        setInterval(function() {
+            moveCarousel(1);
+        }, 5000);
+
+        // 时间轴卡片弹出功能
+        function showTimelineCard(title, description, imageUrl) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h3>${title}</h3>
+                    <img src="${imageUrl}" alt="${title}">
+                    <p>${description}</p>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            const closeBtn = modal.querySelector('.close');
+            closeBtn.addEventListener('click', function() {
+                modal.remove();
+            });
+            
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        // 节日卡片弹出功能
+        function showFestivalCard(title, description, imageUrl) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h3>${title}</h3>
+                    <img src="${imageUrl}" alt="${title}">
+                    <p>${description}</p>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            const closeBtn = modal.querySelector('.close');
+            closeBtn.addEventListener('click', function() {
+                modal.remove();
+            });
+            
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        // 美食卡片弹出功能
+        function showFoodCard(title, description, imageUrl) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h3>${title}</h3>
+                    <img src="${imageUrl}" alt="${title}">
+                    <p>${description}</p>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            const closeBtn = modal.querySelector('.close');
+            closeBtn.addEventListener('click', function() {
+                modal.remove();
+            });
+            
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        // 沉浸式体验功能
+        function openExperience(title, imageUrl) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content experience-modal">
+                    <span class="close">&times;</span>
+                    <h3>${title}体验</h3>
+                    <div class="experience-content">
+                        <img src="${imageUrl}" alt="${title}">
+                        <p>欢迎体验${title}，这是一个沉浸式的文化体验。</p>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            const closeBtn = modal.querySelector('.close');
+            closeBtn.addEventListener('click', function() {
+                modal.remove();
+            });
+            
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+
+        // 开始互动体验
+        function startExperience(experienceName) {
+            if (experienceName === '打馕工坊') {
+                alert('欢迎来到打馕工坊！在这里你可以体验传统维吾尔族馕的制作过程。');
+            } else if (experienceName === '逛巴扎') {
+                alert('欢迎来到虚拟巴扎！在这里你可以体验新疆传统市场的热闹氛围。');
+            } else if (experienceName === '维吾尔族传统舞蹈') {
+                alert('欢迎来到维吾尔族传统舞蹈体验！在这里你可以学习和体验维吾尔族的传统舞蹈艺术。');
+            } else if (experienceName === '哈萨克族奶茶制作') {
+                alert('欢迎来到哈萨克族奶茶制作体验！在这里你可以学习制作正宗的哈萨克族奶茶。');
+            } else if (experienceName === '蒙古族那达慕大会') {
+                alert('欢迎来到蒙古族那达慕大会体验！在这里你可以体验蒙古族传统的那达慕大会活动。');
+            } else if (experienceName === '塔吉克族鹰舞') {
+                alert('欢迎来到塔吉克族鹰舞体验！在这里你可以学习和体验塔吉克族的传统鹰舞。');
+            } else if (experienceName === '柯尔克孜族刺绣') {
+                alert('欢迎来到柯尔克孜族刺绣体验！在这里你可以学习柯尔克孜族的传统刺绣技艺。');
+            } else if (experienceName === '新疆传统乐器体验') {
+                alert('欢迎来到新疆传统乐器体验！在这里你可以学习和体验新疆各民族的传统乐器。');
+            }
+        }
+
+        // 初始化图表
+        function initCharts() {
+            // 非遗分类占比饼图
+            const heritageCtx = document.getElementById('heritageBarChart');
+            if (heritageCtx) {
+                new Chart(heritageCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['传统音乐', '传统舞蹈', '传统戏剧', '传统美术', '传统技艺', '传统医药', '民俗'],
+                        datasets: [{
+                            data: [15, 12, 8, 18, 25, 5, 10],
+                            backgroundColor: [
+                                '#FF6384',
+                                '#36A2EB',
+                                '#FFCE56',
+                                '#4BC0C0',
+                                '#9966FF',
+                                '#FF9F40',
+                                '#C9CBCF'
+                            ],
+                            borderWidth: 3,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        aspectRatio: 1.2,
+                        layout: {
+                            padding: {
+                                top: 10,
+                                bottom: 10,
+                                left: 10,
+                                right: 10
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    font: {
+                                        size: 14
+                                    },
+                                    padding: 15
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 节日活动类型雷达图
+            const festivalCtx = document.getElementById('festivalBarChart');
+            if (festivalCtx) {
+                new Chart(festivalCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['歌舞表演', '美食分享', '传统仪式', '走亲访友', '祈福活动'],
+                        datasets: [{
+                            label: '活动频率',
+                            data: [8, 9, 7, 6, 5],
+                            backgroundColor: 'rgba(139, 69, 19, 0.2)',
+                            borderColor: 'rgba(139, 69, 19, 1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(139, 69, 19, 1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 10
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 烹饪方式统计折线图
+            const cookingCtx = document.getElementById('cookingBarChart');
+            if (cookingCtx) {
+                new Chart(cookingCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['烤', '煮', '蒸', '炸', '炒'],
+                        datasets: [{
+                            label: '使用频率',
+                            data: [8, 5, 3, 2, 4],
+                            fill: true,
+                            backgroundColor: 'rgba(139, 69, 19, 0.2)',
+                            borderColor: 'rgba(139, 69, 19, 1)',
+                            borderWidth: 2,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 食材来源分析饼图
+            const ingredientsCtx = document.getElementById('ingredientsBarChart');
+            if (ingredientsCtx) {
+                new Chart(ingredientsCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['肉类', '谷物', '蔬菜', '水果', '奶制品'],
+                        datasets: [{
+                            data: [30, 25, 20, 15, 10],
+                            backgroundColor: [
+                                '#FF6384',
+                                '#36A2EB',
+                                '#FFCE56',
+                                '#4BC0C0',
+                                '#9966FF'
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 新疆各民族人口分布饼图
+            const populationCtx = document.getElementById('populationChart');
+            if (populationCtx) {
+                new Chart(populationCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['维吾尔族', '汉族', '哈萨克族', '回族', '柯尔克孜族', '蒙古族', '塔吉克族', '其他'],
+                        datasets: [{
+                            data: [1162, 880, 156, 100, 20, 17, 5, 30],
+                            backgroundColor: [
+                                '#FF6384',
+                                '#36A2EB',
+                                '#FFCE56',
+                                '#4BC0C0',
+                                '#9966FF',
+                                '#FF9F40',
+                                '#C9CBCF',
+                                '#8B4513'
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 各民族文化遗产数量对比柱状图
+            const ethnicHeritageCtx = document.getElementById('ethnicHeritageChart');
+            if (ethnicHeritageCtx) {
+                new Chart(ethnicHeritageCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['维吾尔族', '哈萨克族', '柯尔克孜族', '蒙古族', '塔吉克族', '回族'],
+                        datasets: [{
+                            label: '非物质文化遗产数量',
+                            data: [120, 85, 60, 75, 45, 50],
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.8)',
+                                'rgba(54, 162, 235, 0.8)',
+                                'rgba(255, 206, 86, 0.8)',
+                                'rgba(75, 192, 192, 0.8)',
+                                'rgba(153, 102, 255, 0.8)',
+                                'rgba(255, 159, 64, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 新疆人口增长趋势折线图
+            const populationTrendCtx = document.getElementById('populationTrendChart');
+            if (populationTrendCtx) {
+                new Chart(populationTrendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['2010', '2012', '2014', '2016', '2018', '2020', '2022', '2024'],
+                        datasets: [{
+                            label: '新疆总人口（万人）',
+                            data: [2181, 2233, 2299, 2360, 2424, 2585, 2626, 2650],
+                            fill: true,
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 2,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                min: 2000
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 文化产业发展趋势折线图
+            const cultureIndustryCtx = document.getElementById('cultureIndustryChart');
+            if (cultureIndustryCtx) {
+                new Chart(cultureIndustryCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['2018', '2019', '2020', '2021', '2022', '2023', '2024'],
+                        datasets: [{
+                            label: '文化产业总产值（亿元）',
+                            data: [320, 350, 380, 420, 480, 550, 620],
+                            fill: true,
+                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            borderWidth: 2,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
